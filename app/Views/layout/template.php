@@ -11,17 +11,54 @@
 
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" href="/">Peta Kuliner</a>
-      <div class="collapse navbar-collapse">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="/login">Login Admin</a></li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top py-3">
+            <div class="container">
+            <a class="navbar-brand fw-bold text-white" href="/">
+                <span class="fs-4 me-1">🍔</span> PetaKuliner<span class="text-warning">.Mahasiswa</span>
+            </a>
+            
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    
+                    <li class="nav-item">
+                        <a class="nav-link fw-semibold text-white px-3" href="/">Beranda</a>
+                    </li>
+                    
+                    <?php if(session()->get('isLoggedIn')) : ?>
+                        
+                        <?php if(session()->get('role') === 'admin') : ?>
+                            <li class="nav-item mx-lg-2 my-2 my-lg-0">
+                                <a class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm" href="/tambah-kuliner">
+                                    + Tambah Tempat
+                                </a>
+                            </li>
+                        <?php endif; ?>
+                        
+                        <li class="nav-item">
+                            <a class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm" href="/logout">
+                                🚪 Logout
+                            </a>
+                        </li>
+
+                    <?php else : ?>
+                        <li class="nav-item">
+                            <a class="nav-link fw-semibold text-white px-3" href="/login">Login</a>
+                        </li>
+                        <li class="nav-item mx-lg-2 my-2 my-lg-0">
+                            <a class="btn btn-outline-light fw-bold px-4 rounded-pill shadow-sm" href="/register">
+                                📝 Daftar Akun
+                            </a>
+                        </li>
+                    <?php endif; ?>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
 
   <div class="container mt-4">
     <?= $this->renderSection('content'); ?>
@@ -31,6 +68,28 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <?= $this->renderSection('scripts'); ?>
+    <button type="button" class="btn btn-primary rounded-circle shadow-lg" id="btn-back-to-top" style="position: fixed; bottom: 30px; right: 30px; display: none; z-index: 9999; width: 50px; height: 50px; border: 2px solid white;">
+           <span class="fs-5 fw-bold text-white">⇑</span>
+       </button>
+
+    <script>
+        let mybutton = document.getElementById("btn-back-to-top");
+
+        window.onscroll = function () {
+            if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        };
+
+        mybutton.addEventListener("click", function() {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+    </script>
 </body>
 
 </html>
