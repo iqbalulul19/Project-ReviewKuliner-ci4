@@ -3,8 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\PlaceModel;
-use App\Models\PlacePhotoModel; // Panggil model foto
-
+use App\Models\PlacePhotoModel;
 class Home extends BaseController
 {
     public function index()

@@ -13,11 +13,10 @@ $routes->get('/tempat/(:num)', 'Place::detail/$1');
 $routes->get('/login', 'Auth::login');
 $routes->post('/auth/process', 'Auth::process');
 $routes->get('/logout', 'Auth::logout');
-
 // Lindungi fitur tambah data dengan filter 'auth'
 $routes->get('/tambah-kuliner', 'Place::create', ['filter' => 'auth']);
 $routes->post('/place/store', 'Place::store', ['filter' => 'auth']);
-// Route untuk hapus tempat (dilindungi filter auth)
+// Route untuk hapus tempat 
 $routes->get('/tempat/delete/(:num)', 'Place::delete/$1', ['filter' => 'auth']);
 // Route untuk Edit Data
 $routes->get('/tempat/edit/(:num)', 'Place::edit/$1', ['filter' => 'auth']);

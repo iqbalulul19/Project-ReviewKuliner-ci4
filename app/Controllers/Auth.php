@@ -19,7 +19,7 @@ class Auth extends BaseController
     public function register() {
         return view('register');
     }
-    
+
     public function saveRegister() {
         $userModel = new \App\Models\UserModel(); // Pastikan buat UserModel dulu
         $userModel->insert([
@@ -30,21 +30,21 @@ class Auth extends BaseController
         ]);
         return redirect()->to('/login')->with('error', 'Registrasi berhasil! Silakan login.');
     }
-    
+
     // Update fungsi process() untuk menyimpan ROLE di session
     public function process() {
         $userModel = new \App\Models\UserModel();
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
         $user = $userModel->where('username', $username)->first();
-    
+
         if ($user && password_verify($password, $user['password'])) {
             session()->set([
                 'isLoggedIn' => true,
                 'user_id'    => $user['id'],
                 'username'   => $user['username'],
                 'name'       => $user['name'],
-                'role'       => $user['role'] // Simpan role (admin/user)
+                'role'       => $user['role'] 
             ]);
             return redirect()->to('/');
         }

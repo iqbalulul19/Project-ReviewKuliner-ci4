@@ -11,7 +11,7 @@ class CreateReviews extends Migration
         $this->forge->addField([
             'id'         => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
             'place_id'   => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true],
-            'rating'     => ['type' => 'INT', 'constraint' => 1], // Bintang 1 sampai 5
+            'rating'     => ['type' => 'INT', 'constraint' => 1], 
             'comment'    => ['type' => 'TEXT', 'null' => true],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
         ]);

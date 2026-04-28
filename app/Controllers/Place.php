@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Models\PlaceModel;
 use App\Models\PlacePhotoModel;
-use App\Models\ReviewModel; // Tambahkan baris ini
+use App\Models\ReviewModel; 
 
 class Place extends BaseController
 {
@@ -14,7 +14,7 @@ class Place extends BaseController
         return view('add_place');
     }
 
-    // Fungsi untuk nembak API Nominatim (Sesuai spesifikasi tugas D.3)
+    // Fungsi untuk nembak API Nominatim
     public function searchNominatim()
     {
         $address = $this->request->getPost('address');
@@ -36,9 +36,9 @@ class Place extends BaseController
     public function store()
     {
         $placeModel = new PlaceModel();
-        $photoModel = new \App\Models\PlacePhotoModel(); // Panggil model foto
+        $photoModel = new \App\Models\PlacePhotoModel();
 
-        // 1. Simpan data teks & koordinat ke tabel places
+        // Simpan data teks & koordinat ke tabel places
         $placeModel->insert([
             'category_id' => 1,
             'name'        => $this->request->getPost('name'),
@@ -50,7 +50,7 @@ class Place extends BaseController
         // Ambil ID tempat kuliner yang baru saja disimpan
         $placeId = $placeModel->insertID();
 
-        // 2. Proses Upload Foto (Resize dimatikan sementara)
+        // Proses Upload Foto
         if ($imagefile = $this->request->getFiles()) {
             foreach ($imagefile['photos'] as $img) {
                 if ($img->isValid() && ! $img->hasMoved()) {
@@ -76,7 +76,6 @@ class Place extends BaseController
             }
         }
 
-        // Kembali ke halaman utama
         return redirect()->to('/');
     }
 
@@ -105,7 +104,7 @@ class Place extends BaseController
 
         $reviewModel->insert([
             'place_id'   => $place_id,
-            'user_id'    => session()->get('user_id'), // <-- Tangkap ID User yang sedang login
+            'user_id'    => session()->get('user_id'),
             'rating'     => $this->request->getPost('rating'),
             'comment'    => $this->request->getPost('comment'),
             'created_at' => date('Y-m-d H:i:s')
@@ -121,7 +120,7 @@ class Place extends BaseController
         $photoModel = new PlacePhotoModel();
         $reviewModel = new ReviewModel();
 
-        // 1. Cari dan hapus file foto fisik dari folder uploads
+        // Cari dan hapus file foto fisik dari folder uploads
         $photos = $photoModel->where('place_id', $id)->findAll();
         foreach($photos as $foto) {
             $filePath = FCPATH . 'uploads/' . $foto['photo'];
@@ -130,12 +129,11 @@ class Place extends BaseController
             }
         }
 
-        // 2. Hapus data dari database
-        $photoModel->where('place_id', $id)->delete();  // Hapus data foto
-        $reviewModel->where('place_id', $id)->delete(); // Hapus data ulasan
-        $placeModel->delete($id);                       // Hapus data tempat utama
+        // Hapus data dari database
+        $photoModel->where('place_id', $id)->delete();  
+        $reviewModel->where('place_id', $id)->delete();
+        $placeModel->delete($id);                       
 
-        // 3. Kembali ke halaman utama
         return redirect()->to('/');
     }
 
@@ -164,7 +162,6 @@ class Place extends BaseController
             'longitude' => $this->request->getPost('longitude'),
         ]);
 
-        // Setelah berhasil diedit, kembalikan ke halaman detail
         return redirect()->to('/tempat/' . $id);
     }
 }
