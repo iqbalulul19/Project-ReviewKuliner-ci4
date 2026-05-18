@@ -1,6 +1,6 @@
 <?= $this->extend('layout/template'); ?>
-
 <?= $this->section('content'); ?>
+
 <div class="row justify-content-center mt-3 mb-5">
     <div class="col-md-9">
         
@@ -30,19 +30,51 @@
         <div class="card shadow-sm border-0 rounded-4 mb-4">
             <div class="card-body p-4">
                 <h5 class="fw-bold mb-3 border-bottom pb-2">📸 Galeri Foto</h5>
-                <div class="row g-3">
-                    <?php if(empty($photos)) : ?>
-                        <div class="col-12 text-center py-4">
-                            <p class="text-muted fst-italic mb-0">Belum ada foto untuk tempat ini.</p>
-                        </div>
-                    <?php else : ?>
-                        <?php foreach($photos as $foto) : ?>
-                            <div class="col-md-4">
-                                <img src="/uploads/<?= esc($foto['photo']); ?>" class="img-fluid rounded-3 shadow-sm w-100" style="height: 200px; object-fit: cover;" alt="Foto <?= esc($place['name']); ?>">
+                
+                <?php 
+                // Logika Pengecekan: Apakah ada pengunjung yang upload foto?
+                $adaFotoUlasan = false;
+                foreach ($reviews as $rev) {
+                    if (!empty($rev['photo'])) {
+                        $adaFotoUlasan = true;
+                        break;
+                    }
+                }
+                ?>
+
+                <?php if(empty($photos) && !$adaFotoUlasan) : ?>
+                    <div class="col-12 text-center py-4">
+                        <p class="text-muted fst-italic mb-0">Belum ada foto untuk tempat ini.</p>
+                    </div>
+                
+                <?php else : ?>
+                    <div class="row g-3">
+                        
+                        <?php foreach($photos as $foto): ?>
+                            <div class="col-md-3 col-6 position-relative">
+                                <img src="<?= base_url('uploads/' . esc($foto['photo'])); ?>" 
+                                     class="img-fluid rounded-3 shadow-sm w-100" 
+                                     style="height: 200px; object-fit: cover;" 
+                                     alt="Galeri Admin">
+                                <span class="badge bg-dark position-absolute top-0 end-0 m-2 shadow-sm">
+                                    Official
+                                </span>
                             </div>
                         <?php endforeach; ?>
-                    <?php endif; ?>
-                </div>
+                        
+                        <?php foreach($reviews as $rev): ?>
+                            <?php if(!empty($rev['photo'])): ?>
+                                <div class="col-md-3 col-6 position-relative">
+                                    <img src="<?= base_url('uploads/reviews/' . esc($rev['photo'])); ?>" 
+                                         class="img-fluid rounded-3 shadow-sm border border-primary w-100" 
+                                         style="height: 200px; object-fit: cover;" 
+                                         alt="Foto dari <?= esc($rev['name']); ?>">
+                                </div>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
             </div>
         </div>
         
@@ -51,9 +83,14 @@
                 <h5 class="fw-bold mb-3">✍️ Tulis Ulasanmu</h5>
                 
                 <?php if(session()->get('isLoggedIn')) : ?>
-                    <form action="/review/store" method="post">
+                    <form action="/review/store" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="place_id" value="<?= $place['id']; ?>">
                         
+                        <div class="mb-3">
+                            <label>Lampirkan Foto (Opsional)</label>
+                            <input type="file" class="form-control" name="review_photo" accept="image/*">
+                        </div>
+
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label fw-semibold text-dark">Berikan Rating:</label>
@@ -91,18 +128,52 @@
                     </div>
                 <?php else : ?>
                     <div class="list-group list-group-flush">
-                        <?php foreach($reviews as $r) : ?>
-                            <div class="list-group-item px-0 py-3 border-bottom">
-                                <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <strong class="d-block text-primary mb-1"><?= esc($r['name']); ?></strong>
-                                        <span class="fs-5"><?= str_repeat('⭐', $r['rating']); ?></span>
+                        <?php foreach($reviews as $rev): ?>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="text-primary fw-bold mb-0"><?= esc($rev['name']); ?></h6>
+                                                            
+                                        <div class="d-flex align-items-center gap-2">
+                                            <small class="text-muted"><?= date('d M Y, H:i', strtotime($rev['created_at'])); ?></small>
+                                                            
+                                            <?php if(session()->get('user_id') == $rev['user_id']): ?>
+                                                <div class="btn-group shadow-sm">
+                                                    <a href="/review/edit/<?= esc($rev['id']); ?>" class="btn btn-sm btn-outline-primary px-2 rounded-start-3">
+                                                        <i class="bi bi-pencil-square"></i> Edit
+                                                    </a>
+                                                    <a href="/review/user-delete/<?= esc($rev['id']); ?>" 
+                                                       class="btn btn-sm btn-danger text-white px-2 rounded-end-3" 
+                                                       onclick="return confirm('Apakah Anda yakin ingin menghapus ulasan Anda?');">
+                                                        <i class="bi bi-trash"></i> Hapus
+                                                    </a>
+                                                </div>
+                                            
+                                            <?php elseif(session()->get('role') === 'admin'): ?>
+                                                <a href="/review/delete/<?= esc($rev['id']); ?>" 
+                                                   class="btn btn-sm btn-danger text-white shadow-sm px-3 rounded-3 d-flex align-items-center gap-1" 
+                                                   onclick="return confirm('Apakah Anda yakin ingin menghapus ulasan pengguna lain ini? (Aksi Moderasi Admin)');">
+                                                    <i class="bi bi-trash"></i> Hapus
+                                                </a>
+                                                
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
-                                    <small class="text-muted bg-light px-2 py-1 rounded-pill" style="font-size: 12px;">
-                                        <?= date('d M Y, H:i', strtotime($r['created_at'])); ?>
-                                    </small>
+
+                                    <div class="text-warning mb-2">
+                                        <?php for($i=0; $i < $rev['rating']; $i++) { echo '⭐'; } ?>
+                                    </div>
+                                            
+                                    <p class="mb-3"><?= esc($rev['comment']); ?></p>
+                                            
+                                    <?php if(!empty($rev['photo'])): ?>
+                                        <img src="<?= base_url('uploads/reviews/' . esc($rev['photo'])); ?>" 
+                                             alt="Foto dari <?= esc($rev['name']); ?>" 
+                                             class="img-fluid rounded shadow-sm" 
+                                             style="max-width: 250px; object-fit: cover;">
+                                    <?php endif; ?>
+                                    
                                 </div>
-                                <p class="mb-0 mt-2 text-dark"><?= esc($r['comment']); ?></p>
                             </div>
                         <?php endforeach; ?>
                     </div>

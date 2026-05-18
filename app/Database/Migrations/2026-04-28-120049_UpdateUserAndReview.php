@@ -9,7 +9,7 @@ class UpdateUserAndReview extends Migration
     public function up()
     {
     // 1. Ubah tabel admins menjadi users dan tambah kolom 'role' & 'name'
-    $this->forge->addColumn('admins', [
+    $this->forge->addColumn('users', [
         'name' => ['type' => 'VARCHAR', 'constraint' => 100, 'after' => 'id'],
         'role' => ['type' => 'ENUM', 'constraint' => ['admin', 'user'], 'default' => 'user', 'after' => 'password'],
     ]);

@@ -23,3 +23,17 @@ $routes->get('/tempat/edit/(:num)', 'Place::edit/$1', ['filter' => 'auth']);
 $routes->post('/tempat/update/(:num)', 'Place::update/$1', ['filter' => 'auth']);
 $routes->get('/register', 'Auth::register');
 $routes->post('/auth/saveRegister', 'Auth::saveRegister');
+// Route untuk menghapus ulasan (Hanya bisa diakses yang sudah login)
+$routes->get('/review/delete/(:num)', 'Place::deleteReview/$1', ['filter' => 'auth']);
+// Rute untuk pengelolaan ulasan oleh User Sendiri (Wajib Login)
+$routes->get('/review/edit/(:num)', 'Place::editReview/$1', ['filter' => 'auth']);
+$routes->post('/review/update/(:num)', 'Place::updateReview/$1', ['filter' => 'auth']);
+$routes->get('/review/user-delete/(:num)', 'Place::userDeleteReview/$1', ['filter' => 'auth']);
+// Rute Halaman Profil
+$routes->get('/profile', 'Profile::index', ['filter' => 'auth']);
+$routes->get('/profile/edit', 'Profile::edit', ['filter' => 'auth']); 
+$routes->post('/profile/update', 'Profile::update', ['filter' => 'auth']);
+// CRUD Kategori (Khusus Admin)
+$routes->get('/admin/category', 'Category::index', ['filter' => 'auth']);
+$routes->post('/admin/category/store', 'Category::store', ['filter' => 'auth']);
+$routes->get('/admin/category/delete/(:num)', 'Category::delete/$1', ['filter' => 'auth']);

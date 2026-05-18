@@ -14,11 +14,11 @@ class CreateAdmins extends Migration
             'password' => ['type' => 'VARCHAR', 'constraint' => 255],
         ]);
         $this->forge->addKey('id', true);
-        $this->forge->createTable('admins');
+        $this->forge->createTable('users');
     }
 
     public function down()
     {
-        $this->forge->dropTable('admins');
+        $this->forge->dropTable('users');
     }
 }

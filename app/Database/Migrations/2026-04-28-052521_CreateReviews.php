@@ -11,8 +11,10 @@ class CreateReviews extends Migration
         $this->forge->addField([
             'id'         => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
             'place_id'   => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true],
+            'user_id'    => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true],
             'rating'     => ['type' => 'INT', 'constraint' => 1], 
             'comment'    => ['type' => 'TEXT', 'null' => true],
+            'photo'      => ['type' => 'VARCHAR', 'constraint' => 255, 'null' => true],
             'created_at' => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);

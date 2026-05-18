@@ -11,12 +11,26 @@
         <form action="/place/store" method="post" enctype="multipart/form-data">
 
           <div class="mb-3">
-            <label>Nama Tempat Kuliner</label>
+            <label class="form-label fw-bold">Nama Tempat Kuliner</label>
             <input type="text" name="name" class="form-control" required placeholder="Contoh: Nasi Goreng Babat Pak Karmin">
           </div>
 
           <div class="mb-3">
-            <label>Alamat Lengkap</label>
+              <label class="form-label fw-bold">Kategori Tempat</label>
+              <select name="category_id" class="form-select rounded-3" required>
+                  <option value="">-- Pilih Kategori --</option>
+                  <?php 
+                      $catModel = new \App\Models\CategoryModel();
+                      $categories = $catModel->findAll();
+                      foreach($categories as $cat): 
+                  ?>
+                      <option value="<?= $cat['id']; ?>"><?= esc($cat['name']); ?></option>
+                  <?php endforeach; ?>
+              </select>
+          </div>
+                      
+          <div class="mb-3">
+            <label class="form-label fw-bold">Alamat Lengkap</label>
             <div class="input-group">
               <input type="text" id="addressInput" name="address" class="form-control" required placeholder="Contoh: Jl. Pemuda Semarang">
               <button class="btn btn-warning" type="button" id="btnCariKoordinat">Cari Koordinat 📍</button>
@@ -26,17 +40,17 @@
 
           <div class="row mb-3">
             <div class="col-md-6">
-              <label>Latitude</label>
+              <label class="form-label fw-bold">Latitude</label>
               <input type="text" id="latInput" name="latitude" class="form-control" readonly required>
             </div>
             <div class="col-md-6">
-              <label>Longitude</label>
+              <label class="form-label fw-bold">Longitude</label>
               <input type="text" id="lonInput" name="longitude" class="form-control" readonly required>
             </div>
           </div>
 
           <div class="mb-3">
-            <label>Upload Foto (Maksimal 3)</label>
+            <label class="form-label fw-bold">Upload Foto (Maksimal 3)</label>
             <input type="file" name="photos[]" class="form-control" multiple accept="image/*">
             <small class="text-muted">Bisa pilih lebih dari 1 foto. Otomatis di-resize maks 800px.</small>
           </div>

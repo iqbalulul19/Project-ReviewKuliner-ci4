@@ -2,30 +2,59 @@
 
 namespace App\Controllers;
 
-use App\Models\PlaceModel;
-use App\Models\PlacePhotoModel;
 class Home extends BaseController
 {
     public function index()
     {
-        $placeModel = new PlaceModel();
-        $photoModel = new PlacePhotoModel();
+        $placeModel = new \App\Models\PlaceModel();
+        $photoModel = new \App\Models\PlacePhotoModel();
+        $reviewModel = new \App\Models\ReviewModel();
 
-        // Ambil semua data tempat kuliner
-        $places = $placeModel->findAll();
+        $keyword = $this->request->getGet('keyword');
 
-        // Looping untuk mencari 1 foto pertama sebagai thumbnail tiap tempat
-        foreach ($places as &$p) {
-            $photo = $photoModel->where('place_id', $p['id'])->first();
-            
-            // Jika ada foto, simpan nama filenya. Jika tidak, kosongkan.
-            $p['thumbnail'] = $photo ? $photo['photo'] : null;
+        if ($keyword) {
+            // Jauh lebih pintar: Cari di nama tempat, alamat, ATAU gabungkan dengan nama kategori
+            $places = $placeModel->select('places.*, categories.name as category_name')
+                                 ->join('categories', 'categories.id = places.category_id', 'left')
+                                 ->groupStart()
+                                     ->like('places.name', $keyword)
+                                     ->orLike('places.address', $keyword)
+                                     ->orLike('categories.name', $keyword) // 👈 Kunci utamanya di sini!
+                                 ->groupEnd()
+                                 ->findAll();
+        } else {
+            $places = $placeModel->findAll();
+        }
+
+        // Looping pencarian foto cover (Biarkan tetap seperti bawaan milikmu)
+        foreach ($places as $key => $place) {
+            $cover = null;
+            $path = '';
+
+            $fotoAdmin = $photoModel->where('place_id', $place['id'])->first();
+            if ($fotoAdmin) {
+                $cover = $fotoAdmin['photo'];
+                $path = 'uploads/';
+            } else {
+                $fotoReview = $reviewModel->where('place_id', $place['id'])
+                                          ->where('photo IS NOT NULL')
+                                          ->where('photo !=', '')
+                                          ->first();
+                if ($fotoReview) {
+                    $cover = $fotoReview['photo'];
+                    $path = 'uploads/reviews/';
+                }
+            }
+
+            $places[$key]['cover_image'] = $cover;
+            $places[$key]['cover_path'] = $path;
         }
 
         $data = [
-            'places' => $places
+            'places'  => $places,
+            'keyword' => $keyword
         ];
 
-        return view('home', $data);
+        return view('home', $data); 
     }
 }

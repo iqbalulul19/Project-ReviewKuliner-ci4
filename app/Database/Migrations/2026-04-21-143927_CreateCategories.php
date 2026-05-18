@@ -11,6 +11,7 @@ class CreateCategories extends Migration
         $this->forge->addField([
             'id'          => ['type' => 'INT', 'constraint' => 11, 'unsigned' => true, 'auto_increment' => true],
             'name'        => ['type' => 'VARCHAR', 'constraint' => '100'],
+            'slug'        => ['type' => 'VARCHAR', 'constraint' => '100'],
             'created_at'  => ['type' => 'DATETIME', 'null' => true],
         ]);
         $this->forge->addKey('id', true);

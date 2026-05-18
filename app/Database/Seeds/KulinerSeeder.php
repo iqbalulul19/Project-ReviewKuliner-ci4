@@ -8,7 +8,7 @@ class KulinerSeeder extends Seeder
 {
     public function run()
     {
-        // 1. Data Kategori
+        // Data Kategori
         $categories = [
             ['name' => 'Warteg & Nasi', 'created_at' => date('Y-m-d H:i:s')],
             ['name' => 'Cafe & Kopi', 'created_at' => date('Y-m-d H:i:s')],
@@ -17,7 +17,7 @@ class KulinerSeeder extends Seeder
         ];
         $this->db->table('categories')->insertBatch($categories);
 
-        // 2. Data 21 Tempat Kuliner (Sekitar area kampus)
+        // Data 21 Tempat Kuliner (Sekitar area kampus)
         $places = [
             ['category_id' => 1, 'name' => 'Warteg Kharisma Bahari Nakula', 'address' => 'Jl. Nakula I No.10', 'latitude' => -6.982100, 'longitude' => 110.409100, 'created_at' => date('Y-m-d H:i:s')],
             ['category_id' => 1, 'name' => 'Nasi Ayam Bu Pini', 'address' => 'Jl. Pemuda', 'latitude' => -6.981500, 'longitude' => 110.410200, 'created_at' => date('Y-m-d H:i:s')],

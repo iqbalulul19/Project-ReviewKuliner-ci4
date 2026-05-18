@@ -29,13 +29,13 @@ class AuthFilter implements FilterInterface
         return redirect()->to('/login');
     }
 
-    // Jika mencoba akses fitur tambah/edit/hapus tapi bukan admin
-    $uri = $request->getUri()->getPath();
+
+    /*$uri = $request->getUri()->getPath();
     if (strpos($uri, 'tambah') !== false || strpos($uri, 'edit') !== false || strpos($uri, 'delete') !== false) {
         if (session()->get('role') !== 'admin') {
             return redirect()->to('/')->with('error', 'Hanya Admin yang boleh akses fitur ini!');
         }
-    }
+    }*/
     }
 
     /**

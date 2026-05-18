@@ -11,11 +11,14 @@ class Place extends BaseController
     // Menampilkan halaman form tambah tempat
     public function create()
     {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin.');
+        }
         return view('add_place');
     }
 
     // Fungsi untuk nembak API Nominatim
-    public function searchNominatim()
+    /* public function searchNominatim()
     {
         $address = $this->request->getPost('address');
         $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($address) . "&format=json";
@@ -31,7 +34,7 @@ class Place extends BaseController
         curl_close($ch);
 
         return $this->response->setContentType('application/json')->setBody($result);
-    }
+    }*/
 
     public function store()
     {
@@ -102,9 +105,17 @@ class Place extends BaseController
         $reviewModel = new \App\Models\ReviewModel();
         $place_id = $this->request->getPost('place_id');
 
+        $namaFoto = null;
+        $fileFoto = $this->request->getFile('review_photo');
+        if ($fileFoto && $fileFoto->isValid() && ! $fileFoto->hasMoved()) {
+            $namaFoto = $fileFoto->getRandomName();
+            $fileFoto->move(FCPATH . 'uploads/reviews', $namaFoto);
+        }
+
         $reviewModel->insert([
             'place_id'   => $place_id,
             'user_id'    => session()->get('user_id'),
+            'photo'      => $namaFoto,
             'rating'     => $this->request->getPost('rating'),
             'comment'    => $this->request->getPost('comment'),
             'created_at' => date('Y-m-d H:i:s')
@@ -116,6 +127,10 @@ class Place extends BaseController
     // Menghapus Tempat Kuliner beserta foto dan ulasannya
     public function delete($id)
     {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin.');
+        }
+
         $placeModel = new PlaceModel();
         $photoModel = new PlacePhotoModel();
         $reviewModel = new ReviewModel();
@@ -140,6 +155,9 @@ class Place extends BaseController
     // Menampilkan form edit data
     public function edit($id)
     {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin.');
+        }
         $placeModel = new PlaceModel();
         $data['place'] = $placeModel->find($id);
         
@@ -153,6 +171,9 @@ class Place extends BaseController
     // Memproses perubahan data ke database
     public function update($id)
     {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin.');
+        }
         $placeModel = new PlaceModel();
         
         $placeModel->update($id, [
@@ -163,5 +184,102 @@ class Place extends BaseController
         ]);
 
         return redirect()->to('/tempat/' . $id);
+    }
+
+    public function deleteReview($id)
+    {
+        // 1. Keamanan Ekstra: Pastikan yang mengakses ini HANYA Admin
+        if (session()->get('role') !== 'admin') {
+            return redirect()->back()->with('error', 'Akses ditolak! Hanya Admin yang boleh menghapus ulasan.');
+        }
+
+        $reviewModel = new \App\Models\ReviewModel();
+        $review = $reviewModel->find($id);
+
+        if ($review) {
+            // 2. Hapus file foto dari folder server (Jika user tersebut melampirkan foto)
+            if (!empty($review['photo']) && file_exists(FCPATH . 'uploads/reviews/' . $review['photo'])) {
+                unlink(FCPATH . 'uploads/reviews/' . $review['photo']);
+            }
+
+            // 3. Hapus data ulasan dari database
+            $reviewModel->delete($id);
+            
+            return redirect()->back()->with('success', 'Ulasan berhasil dihapus.');
+        }
+
+        return redirect()->back()->with('error', 'Ulasan tidak ditemukan.');
+    }
+
+    // 1. TAMPILKAN HALAMAN EDIT REVIEW
+    public function editReview($id)
+    {
+        $reviewModel = new \App\Models\ReviewModel();
+        $review = $reviewModel->find($id);
+
+        // Kunci utamanya di sini: pakai 'user_id'
+        if (!$review || $review['user_id'] != session()->get('user_id')) {
+            return redirect()->to('/')->with('error', 'Akses ditolak! Anda hanya bisa mengedit ulasan Anda sendiri.');
+        }
+
+        $placeModel = new \App\Models\PlaceModel();
+        $data = [
+            'title'  => 'Edit Ulasan',
+            'review' => $review,
+            'place'  => $placeModel->find($review['place_id'])
+        ];
+
+        return view('edit_review', $data); 
+    }
+
+    // 2. PROSES UPDATE REVIEW KE DATABASE
+    public function updateReview($id)
+    {
+        $reviewModel = new \App\Models\ReviewModel();
+        $review = $reviewModel->find($id);
+
+        // Di sini juga wajib pakai 'user_id'
+        if (!$review || $review['user_id'] != session()->get('user_id')) {
+            return redirect()->to('/')->with('error', 'Akses ditolak.');
+        }
+
+        $namaFoto = $review['photo'];
+        $fileFoto = $this->request->getFile('review_photo');
+
+        if ($fileFoto && $fileFoto->isValid() && !$fileFoto->hasMoved()) {
+            if (!empty($review['photo']) && file_exists(FCPATH . 'uploads/reviews/' . $review['photo'])) {
+                unlink(FCPATH . 'uploads/reviews/' . $review['photo']);
+            }
+            $namaFoto = $fileFoto->getRandomName();
+            $fileFoto->move(FCPATH . 'uploads/reviews', $namaFoto);
+        }
+
+        $reviewModel->update($id, [
+            'rating'  => $this->request->getPost('rating'),
+            'comment' => $this->request->getPost('comment'),
+            'photo'   => $namaFoto
+        ]);
+
+        return redirect()->to('/tempat/' . $review['place_id'])->with('success', 'Ulasan berhasil diperbarui.');
+    }
+
+    // 3. PROSES HAPUS REVIEW OLEH USER SENDIRI
+    public function userDeleteReview($id)
+    {
+        $reviewModel = new \App\Models\ReviewModel();
+        $review = $reviewModel->find($id);
+
+        // Keamanan: Pastikan ulasan ini benar-earth milik user yang sedang login
+        if (!$review || $review['user_id'] != session()->get('user_id')) {
+            return redirect()->back()->with('error', 'Akses ditolak! Anda hanya bisa menghapus ulasan Anda sendiri.');
+        }
+
+        // Hapus foto fisik dari server
+        if (!empty($review['photo']) && file_exists(FCPATH . 'uploads/reviews/' . $review['photo'])) {
+            unlink(FCPATH . 'uploads/reviews/' . $review['photo']);
+        }
+
+        $reviewModel->delete($id);
+        return redirect()->back()->with('success', 'Ulasan Anda berhasil dihapus.');
     }
 }

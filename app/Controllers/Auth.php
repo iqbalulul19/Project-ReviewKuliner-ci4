@@ -21,7 +21,7 @@ class Auth extends BaseController
     }
 
     public function saveRegister() {
-        $userModel = new \App\Models\UserModel(); // Pastikan buat UserModel dulu
+        $userModel = new \App\Models\UserModel();
         $userModel->insert([
             'name'     => $this->request->getPost('name'),
             'username' => $this->request->getPost('username'),
@@ -31,7 +31,7 @@ class Auth extends BaseController
         return redirect()->to('/login')->with('error', 'Registrasi berhasil! Silakan login.');
     }
 
-    // Update fungsi process() untuk menyimpan ROLE di session
+
     public function process() {
         $userModel = new \App\Models\UserModel();
         $username = $this->request->getPost('username');

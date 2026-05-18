@@ -7,6 +7,7 @@
   <title>Peta Kuliner Mahasiswa</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
 
 <body>
@@ -39,8 +40,8 @@
                         <?php endif; ?>
                         
                         <li class="nav-item">
-                            <a class="btn btn-danger fw-bold rounded-pill px-4 shadow-sm" href="/logout">
-                                🚪 Logout
+                            <a href="/profile" class="nav-link fw-bold">
+                                Halo, <?= session()->get('name'); ?> 👤
                             </a>
                         </li>
 
@@ -68,9 +69,9 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <?= $this->renderSection('scripts'); ?>
-    <button type="button" class="btn btn-primary rounded-circle shadow-lg" id="btn-back-to-top" style="position: fixed; bottom: 30px; right: 30px; display: none; z-index: 9999; width: 50px; height: 50px; border: 2px solid white;">
-           <span class="fs-5 fw-bold text-white">⇑</span>
-       </button>
+    <button type="button" class="btn btn-primary rounded-circle shadow-lg" id="btn-back-to-top" style="position: fixed; bottom: 25px; right: 25px; display: none; z-index: 9999; width: 45px; height: 45px; border: 1px solid white;">
+        <i class="bi bi-arrow-up-short fs-5"></i>
+    </button>
 
     <script>
         let mybutton = document.getElementById("btn-back-to-top");
