@@ -11,12 +11,24 @@
                 <form action="/tempat/update/<?= $place['id']; ?>" method="post">
                     
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nama Tempat Kuliner</label>
+                        <label class="form-label fw-bold">Nama Tempat Kuliner</label>
                         <input type="text" name="name" class="form-control" value="<?= esc($place['name']); ?>" required>
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Alamat Lengkap</label>
+                        <label class="form-label fw-bold">Kategori Tempat</label>
+                        <select name="category_id" class="form-select rounded-3" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            <?php foreach($categories as $cat): ?>
+                                <option value="<?= $cat['id']; ?>" <?= $place['category_id'] == $cat['id'] ? 'selected' : ''; ?>>
+                                    <?= esc($cat['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Alamat Lengkap</label>
                         <div class="input-group">
                             <input type="text" id="addressInput" name="address" class="form-control" value="<?= esc($place['address']); ?>" required>
                             <button class="btn btn-primary fw-bold" type="button" onclick="searchLocation()">Cari Koordinat</button>
@@ -26,11 +38,11 @@
 
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Latitude</label>
+                            <label class="form-label fw-bold">Latitude</label>
                             <input type="text" id="latInput" name="latitude" class="form-control bg-light" value="<?= $place['latitude']; ?>" readonly required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold">Longitude</label>
+                            <label class="form-label fw-bold">Longitude</label>
                             <input type="text" id="lngInput" name="longitude" class="form-control bg-light" value="<?= $place['longitude']; ?>" readonly required>
                         </div>
                     </div>

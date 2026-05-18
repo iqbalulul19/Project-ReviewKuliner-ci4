@@ -17,6 +17,38 @@ class Place extends BaseController
         return view('add_place');
     }
 
+    public function searchNominatim()
+    {
+        // Ambil data alamat dari AJAX
+        $address = $this->request->getPost('address');
+        
+        if (empty($address)) {
+            return $this->response->setJSON([]);
+        }
+
+        // URL API Nominatim OpenStreetMap (Wajib di-urlencode agar spasi tidak merusak URL)
+        $url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($address) . "&limit=1";
+
+        // KUNCI PERBAIKAN 2: Wajib set User-Agent bebas (identitas aplikasi) agar Nominatim mau merespon
+        $opts = [
+            "http" => [
+                "method" => "GET",
+                "header" => "User-Agent: PetaKulinerMahasiswa/1.0 (kontak-mahasiswa@example.com)\r\n"
+            ]
+        ];
+
+        $context = stream_context_create($opts);
+        $response = @file_get_contents($url, false, $context);
+
+        // Jika gagal terhubung ke server OpenStreetMap
+        if ($response === FALSE) {
+            return $this->response->setJSON([]);
+        }
+
+        // Kembalikan hasilnya ke AJAX berupa JSON asli
+        return $this->response->setJSON(json_decode($response));
+    }
+
     // Fungsi untuk nembak API Nominatim
     /* public function searchNominatim()
     {
@@ -155,35 +187,33 @@ class Place extends BaseController
     // Menampilkan form edit data
     public function edit($id)
     {
-        if (session()->get('role') !== 'admin') {
-            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin.');
-        }
-        $placeModel = new PlaceModel();
-        $data['place'] = $placeModel->find($id);
-        
-        if(empty($data['place'])) {
-            return redirect()->to('/');
-        }
+    $placeModel = new \App\Models\PlaceModel();
+    $categoryModel = new \App\Models\CategoryModel(); 
 
-        return view('edit_place', $data);
+    $data = [
+        'title'      => 'Edit Tempat Kuliner',
+        'place'      => $placeModel->find($id),
+        'categories' => $categoryModel->findAll() 
+    ];
+
+    return view('edit_place', $data); // Sesuaikan dengan nama file view edit milikmu
     }
 
     // Memproses perubahan data ke database
     public function update($id)
     {
-        if (session()->get('role') !== 'admin') {
-            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin.');
-        }
-        $placeModel = new PlaceModel();
-        
-        $placeModel->update($id, [
-            'name'      => $this->request->getPost('name'),
-            'address'   => $this->request->getPost('address'),
-            'latitude'  => $this->request->getPost('latitude'),
-            'longitude' => $this->request->getPost('longitude'),
-        ]);
+    $placeModel = new \App\Models\PlaceModel();
 
-        return redirect()->to('/tempat/' . $id);
+    // Ambil data post dan pastikan category_id ikut ditangkap
+    $placeModel->update($id, [
+        'name'        => $this->request->getPost('name'),
+        'category_id' => $this->request->getPost('category_id'),
+        'address'     => $this->request->getPost('address'),
+        'latitude'    => $this->request->getPost('latitude'),
+        'longitude'   => $this->request->getPost('longitude'),
+    ]);
+
+    return redirect()->to('/')->with('success', 'Data tempat kuliner berhasil diperbarui.');
     }
 
     public function deleteReview($id)

@@ -8,7 +8,8 @@
         <h5 class="mb-0">Tambah Tempat Kuliner Baru</h5>
       </div>
       <div class="card-body">
-        <form action="/place/store" method="post" enctype="multipart/form-data">
+        <form action="/place/store" method="post" enctype="multipart/form-data"> 
+          <?= csrf_field(); ?>
 
           <div class="mb-3">
             <label class="form-label fw-bold">Nama Tempat Kuliner</label>
@@ -41,11 +42,11 @@
           <div class="row mb-3">
             <div class="col-md-6">
               <label class="form-label fw-bold">Latitude</label>
-              <input type="text" id="latInput" name="latitude" class="form-control" readonly required>
+              <input type="text" id="latitude" name="latitude" class="form-control" readonly required>
             </div>
             <div class="col-md-6">
               <label class="form-label fw-bold">Longitude</label>
-              <input type="text" id="lonInput" name="longitude" class="form-control" readonly required>
+              <input type="text" id="longitude" name="longitude" class="form-control" readonly required>
             </div>
           </div>
 
@@ -65,7 +66,6 @@
 
 <?= $this->section('scripts'); ?>
 <script>
-  // Logika AJAX sesuai spesifikasi D.2
   document.getElementById('btnCariKoordinat').addEventListener('click', function() {
     let alamat = document.getElementById('addressInput').value;
     let status = document.getElementById('statusPencarian');
@@ -77,9 +77,11 @@
 
     status.innerHTML = "<i>Sedang mencari koordinat ke Nominatim... ⏳</i>";
 
-    // Fetch request (AJAX) ke controller CI4
     let formData = new FormData();
     formData.append('address', alamat);
+    
+    // 👇 KUNCI PERBAIKAN 1: Masukkan Token CSRF agar tidak diblokir CodeIgniter
+    formData.append('<?= csrf_token() ?>', '<?= csrf_hash() ?>');
 
     fetch('/place/searchNominatim', {
         method: 'POST',
@@ -87,18 +89,18 @@
       })
       .then(response => response.json())
       .then(data => {
-        if (data.length > 0) {
-          // Berhasil nemu koordinat! Ambil array ke [0] sesuai spesifikasi D.4
-          document.getElementById('latInput').value = data[0].lat;
-          document.getElementById('lonInput').value = data[0].lon;
+        if (data && data.length > 0) {
+          // Berhasil! Ambil array indeks ke-0 sesuai spesifikasi D.4
+          document.getElementById('latitude').value = data[0].lat;
+          document.getElementById('longitude').value = data[0].lon;
           status.innerHTML = "<span class='text-success'><b>Koordinat berhasil ditemukan! ✅</b></span>";
         } else {
-          status.innerHTML = "<span class='text-danger'><b>Alamat tidak ditemukan, coba lebih spesifik. ❌</b></span>";
+          status.innerHTML = "<span class='text-danger'><b>Alamat tidak ditemukan, coba lebih spesifik atau cek koneksi internet. ❌</b></span>";
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        status.innerHTML = "<span class='text-danger'><b>Terjadi kesalahan jaringan.</b></span>";
+        status.innerHTML = "<span class='text-danger'><b>Terjadi kesalahan jaringan atau token kedaluwarsa.</b></span>";
       });
   });
 </script>
