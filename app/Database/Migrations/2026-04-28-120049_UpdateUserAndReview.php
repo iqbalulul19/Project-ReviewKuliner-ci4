@@ -13,7 +13,6 @@ class UpdateUserAndReview extends Migration
         'name' => ['type' => 'VARCHAR', 'constraint' => 100, 'after' => 'id'],
         'role' => ['type' => 'ENUM', 'constraint' => ['admin', 'user'], 'default' => 'user', 'after' => 'password'],
     ]);
-    $this->forge->renameTable('admins', 'users');
 
     // 2. Tambah kolom user_id di tabel reviews
     $this->forge->addColumn('reviews', [

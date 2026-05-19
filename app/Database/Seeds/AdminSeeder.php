@@ -9,10 +9,21 @@ class AdminSeeder extends Seeder
     public function run()
     {
         $data = [
-            'username' => 'admin',
-            // Enkripsi password menggunakan BCRYPT bawaan PHP
-            'password' => password_hash('admin123', PASSWORD_DEFAULT),
+            [
+                'name'       => 'Admin',
+                'username'   => 'admin',
+                'password'   => password_hash('admin123', PASSWORD_DEFAULT),
+                'role'       => 'admin',
+            ],
+            [
+                'name'       => 'Iqbal Ulul',
+                'username'   => 'iqbal',
+                'password'   => password_hash('123', PASSWORD_DEFAULT),
+                'role'       => 'user',
+            ]
         ];
-        $this->db->table('admins')->insert($data);
+
+        // Memasukkan akun admin ke tabel users
+        $this->db->table('users')->insertBatch($data);
     }
 }

@@ -37,3 +37,7 @@ $routes->post('/profile/update', 'Profile::update', ['filter' => 'auth']);
 $routes->get('/admin/category', 'Category::index', ['filter' => 'auth']);
 $routes->post('/admin/category/store', 'Category::store', ['filter' => 'auth']);
 $routes->get('/admin/category/delete/(:num)', 'Category::delete/$1', ['filter' => 'auth']);
+// Rute ini bisa diakses siapa saja asalkan SUDAH LOGIN
+$routes->get('/place/create', 'Place::create', ['filter' => 'auth']);
+$routes->post('/place/store', 'Place::store', ['filter' => 'auth']);
+$routes->post('/place/searchNominatim', 'Place::searchNominatim', ['filter' => 'auth']);

@@ -31,13 +31,11 @@
                     
                     <?php if(session()->get('isLoggedIn')) : ?>
                         
-                        <?php if(session()->get('role') === 'admin') : ?>
-                            <li class="nav-item mx-lg-2 my-2 my-lg-0">
-                                <a class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm" href="/tambah-kuliner">
-                                    + Tambah Tempat
-                                </a>
-                            </li>
-                        <?php endif; ?>
+                        <li class="nav-item mx-lg-2 my-2 my-lg-0">
+                            <a class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm" href="/tambah-kuliner">
+                                + Tambah Tempat
+                            </a>
+                        </li>
                         
                         <li class="nav-item">
                             <a href="/profile" class="nav-link fw-bold">
@@ -46,6 +44,7 @@
                         </li>
 
                     <?php else : ?>
+                        
                         <li class="nav-item">
                             <a class="nav-link fw-semibold text-white px-3" href="/login">Login</a>
                         </li>
@@ -54,6 +53,7 @@
                                 📝 Daftar Akun
                             </a>
                         </li>
+                        
                     <?php endif; ?>
 
                 </ul>

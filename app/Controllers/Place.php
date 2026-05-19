@@ -11,13 +11,13 @@ class Place extends BaseController
     // Menampilkan halaman form tambah tempat
     public function create()
     {
-        if (session()->get('role') !== 'admin') {
-            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin.');
-        }
+        /*if (session()->get('role') !== 'admin' && session()->get('role') !== 'user') {
+            return redirect()->to('/')->with('error', 'Akses ditolak! Hanya Admin dan User.');
+        }*/
         return view('add_place');
     }
 
-    public function searchNominatim()
+    /*public function searchNominatim()
     {
         // Ambil data alamat dari AJAX
         $address = $this->request->getPost('address');
@@ -47,10 +47,10 @@ class Place extends BaseController
 
         // Kembalikan hasilnya ke AJAX berupa JSON asli
         return $this->response->setJSON(json_decode($response));
-    }
+    }*/
 
     // Fungsi untuk nembak API Nominatim
-    /* public function searchNominatim()
+    public function searchNominatim()
     {
         $address = $this->request->getPost('address');
         $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($address) . "&format=json";
@@ -66,7 +66,7 @@ class Place extends BaseController
         curl_close($ch);
 
         return $this->response->setContentType('application/json')->setBody($result);
-    }*/
+    }
 
     public function store()
     {
