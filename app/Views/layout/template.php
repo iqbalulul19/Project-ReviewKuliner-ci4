@@ -29,32 +29,40 @@
                         <a class="nav-link fw-semibold text-white px-3" href="/">Beranda</a>
                     </li>
                     
-                    <?php if(session()->get('isLoggedIn')) : ?>
-                        
-                        <li class="nav-item mx-lg-2 my-2 my-lg-0">
-                            <a class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm" href="/tambah-kuliner">
-                                + Tambah Tempat
-                            </a>
-                        </li>
-                        
-                        <li class="nav-item">
-                            <a href="/profile" class="nav-link fw-bold">
-                                Halo, <?= session()->get('name'); ?> 👤
-                            </a>
-                        </li>
+<?php if(session()->get('isLoggedIn')) : ?>
+    
+    <li class="nav-item mx-lg-2 my-2 my-lg-0">
+        <a class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm" href="/tambah-kuliner">
+            + Tambah Tempat
+        </a>
+    </li>
 
-                    <?php else : ?>
-                        
-                        <li class="nav-item">
-                            <a class="nav-link fw-semibold text-white px-3" href="/login">Login</a>
-                        </li>
-                        <li class="nav-item mx-lg-2 my-2 my-lg-0">
-                            <a class="btn btn-outline-light fw-bold px-4 rounded-pill shadow-sm" href="/register">
-                                📝 Daftar Akun
-                            </a>
-                        </li>
-                        
-                    <?php endif; ?>
+    <?php if(session()->get('role') === 'admin') : ?>
+        <li class="nav-item mx-lg-2 my-2 my-lg-0 align-self-center">
+            <a class="btn btn-info fw-bold rounded-pill px-4 shadow-sm text-white" href="/admin/categories">
+                ⚙️ Kelola Kategori
+            </a>
+        </li>
+    <?php endif; ?>
+    
+    <li class="nav-item mx-lg-2 my-2 my-lg-0 align-self-center">
+        <a href="/profile" class="nav-link fw-bold text-white">
+            Halo, <?= session()->get('name'); ?> 👤
+        </a>
+    </li>
+
+<?php else : ?>
+    
+    <li class="nav-item align-self-center">
+        <a class="nav-link fw-semibold text-white px-3" href="/login">Login</a>
+    </li>
+    <li class="nav-item mx-lg-2 my-2 my-lg-0">
+        <a class="btn btn-outline-light fw-bold px-4 rounded-pill shadow-sm" href="/register">
+            📝 Daftar Akun
+        </a>
+    </li>
+    
+<?php endif; ?>
 
                 </ul>
             </div>

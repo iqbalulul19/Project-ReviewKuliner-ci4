@@ -41,3 +41,11 @@ $routes->get('/admin/category/delete/(:num)', 'Category::delete/$1', ['filter' =
 $routes->get('/place/create', 'Place::create', ['filter' => 'auth']);
 $routes->post('/place/store', 'Place::store', ['filter' => 'auth']);
 $routes->post('/place/searchNominatim', 'Place::searchNominatim', ['filter' => 'auth']);
+
+// Rute Khusus Admin (Kelola Kategori)
+$routes->group('admin', ['filter' => 'auth'], function($routes) {
+    $routes->get('categories', 'CategoryController::index');
+    $routes->post('categories/store', 'CategoryController::store');
+    $routes->post('categories/update/(:num)', 'CategoryController::update/$1');
+    $routes->get('categories/delete/(:num)', 'CategoryController::delete/$1');
+});

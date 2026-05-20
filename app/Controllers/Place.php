@@ -68,14 +68,40 @@ class Place extends BaseController
         return $this->response->setContentType('application/json')->setBody($result);
     }
 
-    public function store()
+       public function store()
     {
+        // 1. BLOK VALIDASI: Cek apakah ada inputan yang kosong
+        $rules = [
+            'name' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Nama tempat kuliner wajib diisi!']
+            ],
+            'category_id' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Silakan pilih kategori terlebih dahulu!']
+            ],
+            'address' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Alamat lengkap tidak boleh kosong!']
+            ],
+            'latitude' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Koordinat wajib diisi! Klik tombol Cari Koordinat.']
+            ]
+        ];
+
+        // Jika validasi gagal, kembalikan ke form beserta pesan error dan inputan sebelumnya
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
+        // 2. PROSES SIMPAN DATABASE (Jika validasi lolos)
         $placeModel = new PlaceModel();
         $photoModel = new \App\Models\PlacePhotoModel();
 
         // Simpan data teks & koordinat ke tabel places
         $placeModel->insert([
-            'category_id' => 1,
+            'category_id' => $this->request->getPost('category_id'), // Pastikan ini mengambil dari form, bukan hardcode angka 1
             'name'        => $this->request->getPost('name'),
             'address'     => $this->request->getPost('address'),
             'latitude'    => $this->request->getPost('latitude'),
@@ -96,12 +122,6 @@ class Place extends BaseController
                     // Pindahkan file ke folder public/uploads/
                     $img->move(FCPATH . 'uploads', $newName);
 
-                    // Panggil library Image CI4 untuk auto-resize maksimal 800px
-                    // \Config\Services::image()
-                    //     ->withFile(FCPATH . 'uploads/' . $newName)
-                    //     ->resize(800, 800, true, 'auto') // true = jaga proporsi gambar
-                    //     ->save(FCPATH . 'uploads/' . $newName);
-
                     // Simpan nama file ke database place_photos
                     $photoModel->insert([
                         'place_id' => $placeId,
@@ -111,24 +131,7 @@ class Place extends BaseController
             }
         }
 
-        return redirect()->to('/');
-    }
-
-    // Menampilkan halaman detail tempat kuliner beserta fotonya
-    public function detail($id) {
-    $placeModel = new PlaceModel();
-    $reviewModel = new ReviewModel();
-    
-    $data['place'] = $placeModel->find($id);
-    $data['photos'] = (new PlacePhotoModel())->where('place_id', $id)->findAll();
-
-    // Ambil review beserta NAMA user-nya
-    $data['reviews'] = $reviewModel->select('reviews.*, users.name')
-                                   ->join('users', 'users.id = reviews.user_id')
-                                   ->where('place_id', $id)
-                                   ->orderBy('reviews.created_at', 'DESC')
-                                   ->findAll();
-    return view('detail_place', $data);
+        return redirect()->to('/')->with('success', 'Tempat kuliner berhasil ditambahkan!');
     }
 
     // Menyimpan data review & rating ke database
