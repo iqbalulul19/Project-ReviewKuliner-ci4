@@ -43,6 +43,7 @@ class Place extends BaseController
         return $this->response->setContentType('application/json')->setBody($result);
     }
 
+<<<<<<< HEAD
     // Menampilkan halaman detail tempat kuliner beserta fotonya
     public function detail($id) 
     {
@@ -72,6 +73,8 @@ class Place extends BaseController
         return view('detail_place', $data); 
     }
 
+=======
+>>>>>>> d3b33dfa51d49f28e6050712030ca60f4a87111b
     public function store()
     {
         // 1. BLOK VALIDASI: Cek apakah ada inputan yang kosong
