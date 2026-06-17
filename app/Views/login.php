@@ -13,17 +13,32 @@
                     </div>
                 <?php endif; ?>
 
-                <form action="/auth/process" method="post">
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required autofocus>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 fw-bold">Login</button>
-                </form>
+<form action="/auth/process" method="post">
+    <?= csrf_field() ?>
+    
+    <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input type="text" name="username" 
+               class="form-control <?= session('errors.username') ? 'is-invalid' : '' ?>" 
+               value="<?= old('username') ?>" autofocus>
+               
+        <?php if(session('errors.username')) : ?>
+            <div class="invalid-feedback"><?= session('errors.username') ?></div>
+        <?php endif; ?>
+    </div>
+    
+    <div class="mb-4">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" 
+               class="form-control <?= session('errors.password') ? 'is-invalid' : '' ?>">
+               
+        <?php if(session('errors.password')) : ?>
+            <div class="invalid-feedback"><?= session('errors.password') ?></div>
+        <?php endif; ?>
+    </div>
+    
+    <button type="submit" class="btn btn-primary w-100 fw-bold">Login</button>
+</form>
             </div>
         </div>
     </div>

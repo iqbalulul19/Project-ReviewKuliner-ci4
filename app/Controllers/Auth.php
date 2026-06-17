@@ -20,8 +20,35 @@ class Auth extends BaseController
         return view('register');
     }
 
-    public function saveRegister()
+public function saveRegister()
     {
+        // 1. Aturan Validasi Registrasi
+        $rules = [
+            'name'     => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Nama lengkap wajib diisi!']
+            ],
+            'username' => [
+                'rules'  => 'required|is_unique[users.username]', // Sekaligus mengecek agar username tidak kembar
+                'errors' => [
+                    'required' => 'Username wajib diisi!',
+                    'is_unique'=> 'Username ini sudah dipakai, pilih yang lain!'
+                ]
+            ],
+            'password' => [
+                'rules'  => 'required|min_length[5]',
+                'errors' => [
+                    'required'  => 'Password wajib diisi!',
+                    'min_length'=> 'Password terlalu pendek, minimal 5 karakter!'
+                ]
+            ]
+        ];
+
+        // 2. Jika validasi gagal, kembalikan ke form register beserta error
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
         $userModel = new \App\Models\UserModel();
         $userModel->insert([
             'name'     => $this->request->getPost('name'),
@@ -34,6 +61,23 @@ class Auth extends BaseController
 
     public function process()
     {
+        // 1. Aturan Validasi Login
+        $rules = [
+            'username' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Username tidak boleh kosong!']
+            ],
+            'password' => [
+                'rules'  => 'required',
+                'errors' => ['required' => 'Password tidak boleh kosong!']
+            ]
+        ];
+
+        // 2. Jika validasi gagal, kembalikan ke form login beserta error
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+        }
+
         $userModel = new \App\Models\UserModel();
         $username = $this->request->getPost('username');
         $password = $this->request->getPost('password');
@@ -41,7 +85,7 @@ class Auth extends BaseController
 
         if ($user && password_verify($password, $user['password'])) {
             session()->set([
-                'logged_in' => true, // SINKRONISASI: Pakai 'logged_in' agar sinkron dengan navbar & routes
+                'logged_in' => true,
                 'user_id'   => $user['id'],
                 'username'  => $user['username'],
                 'name'      => $user['name'],
@@ -49,7 +93,7 @@ class Auth extends BaseController
             ]);
             return redirect()->to('/');
         }
-        return redirect()->back()->with('error', 'Login Gagal!');
+        return redirect()->back()->with('error', 'Login Gagal! Username atau Password salah.');
     }
 
     public function logout()

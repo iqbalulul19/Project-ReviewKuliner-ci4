@@ -26,10 +26,8 @@ $routes->post('/auth/saveRegister', 'Auth::saveRegister');
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // Fitur Manajemen Tempat Kuliner oleh User
-<<<<<<< HEAD
+
     $routes->get('/tempat/(:num)', 'Place::detail/$1');
-=======
->>>>>>> d3b33dfa51d49f28e6050712030ca60f4a87111b
     $routes->get('tambah-kuliner', 'Place::create');
     $routes->post('place/store', 'Place::store');
     $routes->post('place/searchNominatim', 'Place::searchNominatim');
@@ -57,10 +55,8 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 $routes->group('admin', ['filter' => 'auth'], function ($routes) {
 
     // Kelola Master Kategori Kuliner (Sinkron dengan CategoryController)
-<<<<<<< HEAD
+
     $routes->get('/tempat/(:num)', 'Place::detail/$1');
-=======
->>>>>>> d3b33dfa51d49f28e6050712030ca60f4a87111b
     $routes->get('categories', 'CategoryController::index');
     $routes->post('categories/store', 'CategoryController::store');
     $routes->post('categories/update/(:num)', 'CategoryController::update/$1');

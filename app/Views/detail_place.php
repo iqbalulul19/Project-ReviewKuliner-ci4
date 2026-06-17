@@ -82,11 +82,7 @@
             <div class="card-body p-4">
                 <h5 class="fw-bold mb-3">✍️ Tulis Ulasanmu</h5>
                 
-<<<<<<< HEAD
                 <?php if(session()->get('logged_in')) : ?>
-=======
-                <?php if(session()->get('isLoggedIn')) : ?>
->>>>>>> d3b33dfa51d49f28e6050712030ca60f4a87111b
                     <form action="/review/store" method="post" enctype="multipart/form-data">
                         <input type="hidden" name="place_id" value="<?= $place['id']; ?>">
                         
