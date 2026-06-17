@@ -1,6 +1,14 @@
 <?= $this->extend('layout/template'); ?>
 
 <?= $this->section('content'); ?>
+
+<?php
+// Mengambil flashdata dengan nama baru agar tidak bentrok
+$validationErrors = session()->getFlashdata('tag_errors');
+$modalAction      = session()->getFlashdata('modal_action');
+$errorId          = session()->getFlashdata('error_id');
+?>
+
 <div class="container mt-4">
   <div class="row">
     <div class="col-md-12">
@@ -53,9 +61,30 @@
                       <form action="/admin/tags/update/<?= $tag['id']; ?>" method="post">
                         <?= csrf_field(); ?>
                         <div class="modal-body p-4">
+
+                          <?php if (!empty($validationErrors) && $modalAction === 'edit' && $errorId == $tag['id']) : ?>
+                            <div class="alert alert-danger" role="alert">
+                              <h6 class="alert-heading fw-bold mb-1">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>Terdapat Kesalahan:
+                              </h6>
+                              <hr class="mt-1 mb-2">
+                              <ul class="mb-0 ps-3">
+                                <?php foreach ($validationErrors as $error) : ?>
+                                  <li><?= esc($error) ?></li>
+                                <?php endforeach; ?>
+                              </ul>
+                            </div>
+                          <?php endif; ?>
+
                           <div class="mb-3">
                             <label class="form-label fw-bold">Nama Tag</label>
-                            <input type="text" name="name" class="form-control" value="<?= esc($tag['name']); ?>" required>
+                            <?php
+                            $currentValue = esc($tag['name']);
+                            if ($modalAction === 'edit' && $errorId == $tag['id'] && old('name') !== null) {
+                              $currentValue = old('name');
+                            }
+                            ?>
+                            <input type="text" name="name" class="form-control" value="<?= $currentValue; ?>">
                             <small class="text-muted d-block mt-1">Ganti namanya langsung tanpa memakai tanda pagar (#).</small>
                           </div>
                         </div>
@@ -91,12 +120,11 @@
         <?= csrf_field(); ?>
         <div class="modal-body p-4">
 
-          <?php $errorsTag = session()->getFlashdata('errorValidation'); ?>
-          <?php if (!empty($errorsTag)) : ?>
-            <div class="alert alert-danger pb-0 rounded-3">
-              <ul>
-                <?php foreach ($errorsTag as $error) : ?>
-                  <li><?= esc($error); ?></li>
+          <?php if (!empty($validationErrors) && $modalAction === 'tambah') : ?>
+            <div class="alert alert-danger" role="alert">
+              <ul class="mb-0 ps-3">
+                <?php foreach ($validationErrors as $error) : ?>
+                  <li><?= esc($error) ?></li>
                 <?php endforeach; ?>
               </ul>
             </div>
@@ -104,8 +132,13 @@
 
           <div class="mb-3">
             <label class="form-label fw-bold">Nama Tag / Karakteristik</label>
-            <input type="text" name="name" class="form-control py-2" value="<?= old('name'); ?>" placeholder="Contoh: Aesthetic, Lesehan, Outdoor" required>
-            <small class="text-muted d-block mt-1">Ketik namanya saja, tidak perlu memakai tanda pagar (#).</small>
+            <?php
+            $addValue = '';
+            if ($modalAction === 'tambah' && old('name') !== null) {
+              $addValue = old('name');
+            }
+            ?>
+            <input type="text" name="name" class="form-control py-2" value="<?= $addValue; ?>" placeholder="Contoh: Aesthetic, Lesehan, Outdoor">
           </div>
         </div>
         <div class="modal-footer border-0 p-3 bg-light rounded-bottom-4">
@@ -116,13 +149,16 @@
   </div>
 </div>
 
-<?php if (session()->getFlashdata('errorValidation')) : ?>
-  <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      var myModal = new bootstrap.Modal(document.getElementById('modalTambah'));
-      myModal.show();
-    });
-  </script>
-<?php endif; ?>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    <?php if ($modalAction === 'tambah') : ?>
+      var modalTambah = new bootstrap.Modal(document.getElementById('modalTambah'));
+      modalTambah.show();
+    <?php elseif ($modalAction === 'edit' && !empty($errorId)) : ?>
+      var modalEdit = new bootstrap.Modal(document.getElementById('modalEdit<?= $errorId ?>'));
+      modalEdit.show();
+    <?php endif; ?>
+  });
+</script>
 
 <?= $this->endSection(); ?>
