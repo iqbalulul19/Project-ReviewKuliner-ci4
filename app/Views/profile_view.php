@@ -14,7 +14,7 @@
 
             <div class="card shadow-lg border-0 rounded-4 overflow-hidden mb-4">
                 
-                <div style="height: 130px; background: linear-gradient(135deg, #0d6efd, #6610f2);"></div>
+<div style="height: 130px; background: linear-gradient(135deg, #0C7779, #249E94);"></div>
                 
                 <div class="card-body p-4 text-center position-relative">
                     
