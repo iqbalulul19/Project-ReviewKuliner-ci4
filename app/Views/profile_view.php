@@ -44,11 +44,6 @@
                         <a href="/profile/edit" class="btn btn-primary fw-bold rounded-4 py-2 shadow-sm d-flex justify-content-center align-items-center gap-2">
                             <i class="bi bi-pencil-square fs-5"></i> Edit Profil & Password
                         </a>
-                        
-                        <a href="/logout" class="btn btn-light text-danger fw-bold rounded-4 py-2 border d-flex justify-content-center align-items-center gap-2 transition" 
-                           onclick="return confirm('Apakah Anda yakin ingin keluar dari akun ini?')">
-                            <i class="bi bi-box-arrow-right fs-5"></i> Keluar Akun
-                        </a>
                     </div>
 
                 </div>
