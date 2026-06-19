@@ -54,8 +54,10 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 // ====================================================================
 $routes->group('admin', ['filter' => 'auth'], function ($routes) {
 
-    // Kelola Master Kategori Kuliner (Sinkron dengan CategoryController)
+    // Mengarahkan URL admin/places ke Controller Place dan fungsi places
+    $routes->get('places', 'Place::places');
 
+    // Kelola Master Kategori Kuliner (Sinkron dengan CategoryController)
     $routes->get('/tempat/(:num)', 'Place::detail/$1');
     $routes->get('categories', 'CategoryController::index');
     $routes->post('categories/store', 'CategoryController::store');
@@ -67,4 +69,15 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('tags/store', 'TagController::store');
     $routes->post('tags/update/(:num)', 'TagController::update/$1');
     $routes->get('tags/delete/(:num)', 'TagController::delete/$1');
+});
+
+// ====================================================================
+// 4. RUTE WEBSERVICE API (Untuk dikonsumsi aplikasi luar / Mobile)
+// ====================================================================
+
+$routes->get('api/docs', 'Api\PlaceApi::docs');
+// PERBAIKAN: Menambahkan filter 'apikey' agar rute ini dikunci
+$routes->group('api', ['filter' => 'apikey'], function ($routes) {
+    // Endpoint GET untuk mengambil semua data tempat
+    $routes->get('places', 'Api\PlaceApi::index');
 });

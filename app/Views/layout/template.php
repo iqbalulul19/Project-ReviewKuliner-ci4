@@ -79,8 +79,8 @@
            3. SIDEBAR KIRI (Mode Gelap Elegan)
            ========================================= */
         #sidebar { 
-            min-width: 220px; 
-            max-width: 220px; 
+            min-width: 240px; /* Tambah 20px agar lebih lega */
+            max-width: 240px;
             background: #005461; /* Teal Paling Gelap */
             transition: all 0.3s; 
             overflow-y: auto; 
@@ -112,21 +112,26 @@
         
         #sidebar ul.components { padding: 20px 0; flex-grow: 1; border-bottom: none !important; }
         
-#sidebar ul li a { 
+        /* CSS Sidebar yang dikunci agar posisi teks stabil */
+        #sidebar ul li a { 
             padding: 12px 15px; 
             margin: 0 15px 5px 15px; 
             border-radius: 8px;      
             font-size: 1.05em; 
             display: block; 
-            color: #ffffff !important; /* Paksa menjadi putih */
+            color: #ffffff !important; 
             text-decoration: none; 
-            transition: 0.2s;
+            transition: background 0.2s; /* Hanya transisi background saja */
+            font-weight: 500;            /* Tetap 500 */
+            white-space: nowrap;         /* Mencegah teks turun ke bawah */
+            overflow: hidden;            /* Menyembunyikan jika teks terlalu panjang */
+            text-overflow: ellipsis;     /* Memberikan titik-titik jika teks kepanjangan */
         }
         
         #sidebar ul li a:hover, #sidebar ul li.active > a { 
-            color: #fff; 
-            background: #249E94; /* Teal sedang menyala saat aktif */
-            font-weight: 600;
+            color: #005461 !important; 
+            background: #ffffff !important; 
+            font-weight: 500;            /* TETAP 500, jangan diubah */
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
         
@@ -136,7 +141,7 @@
         /* =========================================
            4. KONTEN KANAN & NAVBAR ATAS
            ========================================= */
-        #content { width: calc(100% - 220px); padding: 0; height: 100vh; display: flex; flex-direction: column; }
+        #content { width: calc(100% - 240px); padding: 0; height: 100vh; display: flex; flex-direction: column; }
         
         .top-navbar { 
             height: 70px !important; 
@@ -170,6 +175,30 @@
         
         .main-content { padding: 30px; flex-grow: 1; overflow-y: auto; overflow-x: hidden; width: 100%; }
         .top-navbar .text-primary { color: #249E94 !important; }
+
+        .btn-outline-primary {
+            color: #249E94 !important; /* Warna teks Teal */
+            border-color: #249E94 !important; /* Warna garis Teal */
+            background-color: transparent !important;
+        }
+        
+        .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary:active {
+            color: #ffffff !important; /* Teks jadi putih saat dihover/diklik */
+            background-color: #249E94 !important; /* Background jadi Teal saat dihover/diklik */
+            border-color: #249E94 !important;
+            box-shadow: 0 0 0 0.25rem rgba(36, 158, 148, 0.25) !important; /* Efek bayangan saat diklik */
+        }
+
+        .modal-header.bg-primary {
+            background: linear-gradient(135deg, #0C7779, #249E94) !important;
+            border-bottom: none !important;
+        }
+
+        .form-control:focus {
+            outline: none !important;
+            box-shadow: none !important;
+            border: 1px solid #ced4da; /* Kembali ke warna border asli */
+        }
     </style>
 </head>
 <body>
@@ -193,6 +222,9 @@
                     <?php if (session()->get('role') === 'admin') : ?>
                         <li class="mt-4 px-3 mb-1">
                             <small class="text-uppercase" style="color: rgba(255,255,255,0.5); font-weight: 700; font-size: 11px;">Panel Admin</small>
+                        </li>
+                        <li class="<?= url_is('admin/places*') ? 'active' : '' ?>">
+                            <a href="/admin/places"><i class="bi bi-shop me-2"></i> Kelola Tempat</a>
                         </li>
                         <li class="<?= url_is('admin/categories*') ? 'active' : '' ?>">
                             <a href="/admin/categories"><i class="bi bi-grid-fill"></i> Kelola Kategori</a>

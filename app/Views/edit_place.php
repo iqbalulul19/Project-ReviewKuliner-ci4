@@ -66,7 +66,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <a href="/tempat/<?= $place['id']; ?>" class="btn btn-outline-secondary fw-bold rounded-pill px-4">Batal</a>
+                        <a href="/admin/places" class="btn btn-outline-secondary rounded-pill px-4">Batal</a>
                         <button type="submit" class="btn btn-success fw-bold rounded-pill px-4">Simpan Perubahan</button>
                     </div>
                 </form>

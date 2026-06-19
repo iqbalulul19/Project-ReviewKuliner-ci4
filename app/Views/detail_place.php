@@ -1,30 +1,20 @@
 <?= $this->extend('layout/template'); ?>
 <?= $this->section('content'); ?>
 
-<div class="row justify-content-center mt-3 mb-5">
-    <div class="col-md-9">
+<div class="row mt-3 mb-5">
+    <div class="col-md-12">
         
-        <div class="d-flex justify-content-between align-items-start mb-4">
-            <div>
+        <div class="d-flex justify-content-between align-items-start mb-4 gap-3">
+            
+            <div class="flex-grow-1">
                 <a href="/" class="btn btn-outline-secondary btn-sm mb-3 fw-bold rounded-pill px-3">
                     &larr; Kembali ke Peta
                 </a>
                 <h2 class="fw-bold text-primary mb-1"><?= esc($place['name']); ?></h2>
-                <p class="text-muted fs-6">
+                <p class="text-muted fs-6 mb-0">
                     📍 <?= esc($place['address']); ?>
                 </p>
             </div>
-
-            <?php if(session()->get('role') === 'admin') : ?>
-                <div>
-                    <a href="/tempat/edit/<?= $place['id']; ?>" class="btn btn-warning btn-sm fw-bold rounded-pill px-3 shadow-sm me-1">
-                        ✏️ Edit
-                    </a>
-                    <a href="/tempat/delete/<?= $place['id']; ?>" class="btn btn-danger btn-sm fw-bold rounded-pill px-3 shadow-sm" onclick="return confirm('Yakin ingin menghapus tempat ini?');">
-                        🗑️ Hapus
-                    </a>
-                </div>
-            <?php endif; ?>
         </div>
 
         <div class="card shadow-sm border-0 rounded-4 mb-4">
@@ -32,7 +22,6 @@
                 <h5 class="fw-bold mb-3 border-bottom pb-2">📸 Galeri Foto</h5>
                 
                 <?php 
-                // Logika Pengecekan: Apakah ada pengunjung yang upload foto?
                 $adaFotoUlasan = false;
                 foreach ($reviews as $rev) {
                     if (!empty($rev['photo'])) {
@@ -129,14 +118,14 @@
                 <?php else : ?>
                     <div class="list-group list-group-flush">
                         <?php foreach($reviews as $rev): ?>
-                            <div class="card mb-3">
+                            <div class="card mb-3 border-0 shadow-sm rounded-3">
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h6 class="text-primary fw-bold mb-0"><?= esc($rev['name']); ?></h6>
-                                                            
+                                                    
                                         <div class="d-flex align-items-center gap-2">
                                             <small class="text-muted"><?= date('d M Y, H:i', strtotime($rev['created_at'])); ?></small>
-                                                            
+                                                    
                                             <?php if(session()->get('user_id') == $rev['user_id']): ?>
                                                 <div class="btn-group shadow-sm">
                                                     <a href="/review/edit/<?= esc($rev['id']); ?>" class="btn btn-sm btn-outline-primary px-2 rounded-start-3">
