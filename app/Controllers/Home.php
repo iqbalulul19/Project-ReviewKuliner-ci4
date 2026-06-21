@@ -13,20 +13,22 @@ class Home extends BaseController
         $keyword = $this->request->getGet('keyword');
 
         if ($keyword) {
-            // Jauh lebih pintar: Cari di nama tempat, alamat, ATAU gabungkan dengan nama kategori
+            // Filter: Hanya tampilkan yang disetujui (approved) saja
             $places = $placeModel->select('places.*, categories.name as category_name')
-                                 ->join('categories', 'categories.id = places.category_id', 'left')
-                                 ->groupStart()
-                                     ->like('places.name', $keyword)
-                                     ->orLike('places.address', $keyword)
-                                     ->orLike('categories.name', $keyword) // 👈 Kunci utamanya di sini!
-                                 ->groupEnd()
-                                 ->findAll();
+                ->join('categories', 'categories.id = places.category_id', 'left')
+                ->where('places.status', 'approved') // <-- Kunci perbaikannya di sini
+                ->groupStart()
+                ->like('places.name', $keyword)
+                ->orLike('places.address', $keyword)
+                ->orLike('categories.name', $keyword)
+                ->groupEnd()
+                ->findAll();
         } else {
-            $places = $placeModel->findAll();
+            // Filter: Tampilkan semua asalkan statusnya disetujui
+            $places = $placeModel->where('status', 'approved')->findAll(); // <-- Kunci perbaikannya di sini
         }
 
-        // Looping pencarian foto cover (Biarkan tetap seperti bawaan milikmu)
+        // Looping pencarian foto cover (Biarkan tetap seperti bawaan)
         foreach ($places as $key => $place) {
             $cover = null;
             $path = '';
@@ -37,9 +39,9 @@ class Home extends BaseController
                 $path = 'uploads/';
             } else {
                 $fotoReview = $reviewModel->where('place_id', $place['id'])
-                                          ->where('photo IS NOT NULL')
-                                          ->where('photo !=', '')
-                                          ->first();
+                    ->where('photo IS NOT NULL')
+                    ->where('photo !=', '')
+                    ->first();
                 if ($fotoReview) {
                     $cover = $fotoReview['photo'];
                     $path = 'uploads/reviews/';
@@ -55,6 +57,6 @@ class Home extends BaseController
             'keyword' => $keyword
         ];
 
-        return view('home', $data); 
+        return view('home', $data);
     }
 }
