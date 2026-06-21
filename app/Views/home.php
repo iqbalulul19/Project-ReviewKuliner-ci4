@@ -1,6 +1,7 @@
 <?= $this->extend('layout/template'); ?>
 
 <?= $this->section('content'); ?>
+
     <div class="bg-light rounded-4 px-4 py-5 mb-5 shadow-sm text-center position-relative overflow-hidden" style="border: 1px solid rgba(0,0,0,0.05);">
     <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(135deg, rgba(13,110,253,0.05), rgba(102,16,242,0.05)); z-index: 0;"></div>
     
@@ -44,16 +45,16 @@
         <?php if(!empty($keyword)): ?>
             <div class="mt-3">
                 <small class="text-muted">Menampilkan hasil untuk: <strong>"<?= esc($keyword); ?>"</strong></small>
-                <a href="/" class="ms-2 badge bg-danger text-decoration-none">Reset <i class="bi bi-x-circle"></i></a>
+                <a href="/" class="btn" style="color: white !important; font-size: 0.700rem; background-color: #dc3545 !important; padding: 0.350rem 0.70rem;">Reset ⊗</a>
             </div>
         <?php endif; ?>
         </div>
     </div>
 
     <div class="card shadow-lg border-0 rounded-4 mb-5 overflow-hidden">
-        <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center">
-            <h5 class="fw-bold m-0 text-dark">
-                <i class="bi bi-map text-primary me-2"></i> Jelajahi Peta
+        <div class="card-header bg-white border-bottom-0 pt-4 pb-2 px-4 d-flex justify-content-between align-items-center" style="padding-top: 1.5rem !important; padding-bottom: 1.25rem !important;">
+            <h5 class="fw-bold m-0 text-light">
+                <i class="bi bi-map-fill me-2"></i>Jelajahi Peta 
             </h5>
             <span class="badge bg-light text-dark border px-2 py-1 rounded-3">
                 <i class="bi bi-geo-alt-fill text-danger"></i> <?= count($places); ?> Tempat Ditemukan

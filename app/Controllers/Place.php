@@ -24,23 +24,110 @@ class Place extends BaseController
         return view('add_place', $data);
     }
 
-    // Fungsi untuk nembak API Nominatim
+    // Fungsi untuk nembak API Nominatim (Webservice Client) + Error Handling + Cache
     public function searchNominatim()
     {
         $address = $this->request->getPost('address');
+
+        // 1. ERROR HANDLING: Validasi jika input alamat kosong
+        if (empty(trim($address))) {
+            return $this->response->setStatusCode(400)->setJSON([
+                'status'  => 'error',
+                'message' => 'Alamat tidak boleh kosong.'
+            ]);
+        }
+
+        // ================================================================
+        // FITUR CACHE (Syarat Rubrik Poin 5 untuk nilai maksimal 15%)
+        // ================================================================
+        $cache = \Config\Services::cache();
+        // Membuat nama kunci cache unik berdasarkan nama alamat
+        $cacheKey = 'nominatim_' . md5(strtolower(trim($address)));
+
+        // Cek apakah data koordinat alamat ini sudah pernah dicari sebelumnya
+        if ($cachedData = $cache->get($cacheKey)) {
+            // Jika ada di cache, langsung kembalikan datanya (Lebih cepat tanpa perlu hit API lagi!)
+            return $this->response->setContentType('application/json')->setBody($cachedData);
+        }
+        // ================================================================
+
         $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($address) . "&format=json";
 
-        // Kita pakai cURL untuk kirim request ke Nominatim
+        // Inisialisasi cURL
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        // Nominatim mewajibkan kita ngasih tau siapa yang akses (User-Agent)
-        curl_setopt($ch, CURLOPT_USERAGENT, 'KulinerApp_Mahasiswa/1.0');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'KulinerApp_Mahasiswa/1.0'); // Identitas WAJIB untuk Nominatim
+
+        // 2. ERROR HANDLING: Batas waktu maksimal koneksi (Timeout) 10 detik
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
         $result = curl_exec($ch);
+
+        // Ambil info status HTTP dan pesan error cURL
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
         curl_close($ch);
 
+        // 3. ERROR HANDLING: Jika gagal terkoneksi (misal internet mati atau timeout)
+        if ($result === false) {
+            return $this->response->setStatusCode(500)->setJSON([
+                'status'  => 'error',
+                'message' => 'Gagal terhubung ke server peta: ' . $curlError
+            ]);
+        }
+
+        // 4. ERROR HANDLING: Jika API Nominatim bermasalah (misal server mereka down)
+        if ($httpcode !== 200) {
+            return $this->response->setStatusCode($httpcode)->setJSON([
+                'status'  => 'error',
+                'message' => 'Layanan peta sedang tidak tersedia (Error ' . $httpcode . ')'
+            ]);
+        }
+
+        // 5. ERROR HANDLING: Cek apakah hasil pencarian kosong (alamat tidak ditemukan)
+        $dataArray = json_decode($result, true);
+        if (empty($dataArray)) {
+            return $this->response->setStatusCode(404)->setJSON([
+                'status'  => 'error',
+                'message' => 'Koordinat untuk alamat tersebut tidak ditemukan di peta.'
+            ]);
+        }
+
+        // Jika sukses dan alamat ditemukan, simpan hasilnya ke Cache selama 24 jam (86400 detik)
+        $cache->save($cacheKey, $result, 86400);
+
+        // Kembalikan response sukses
         return $this->response->setContentType('application/json')->setBody($result);
+    }
+
+    // Menampilkan halaman detail tempat kuliner beserta fotonya
+    public function detail($id)
+    {
+        $placeModel = new \App\Models\PlaceModel();
+        $photoModel = new \App\Models\PlacePhotoModel();
+        $reviewModel = new \App\Models\ReviewModel();
+
+        // 1. Ambil data tempat berdasarkan ID
+        $data['place'] = $placeModel->find($id);
+
+        // Jika ID tempat tidak ada di database, munculkan halaman 404
+        if (!$data['place']) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Tempat kuliner tidak ditemukan di database!");
+        }
+
+        // 2. Ambil semua foto yang terkait dengan tempat ini
+        $data['photos'] = $photoModel->where('place_id', $id)->findAll();
+
+        // 3. Ambil data ulasan (review) beserta NAMA user-nya
+        $data['reviews'] = $reviewModel->select('reviews.*, users.name')
+            ->join('users', 'users.id = reviews.user_id')
+            ->where('place_id', $id)
+            ->orderBy('reviews.created_at', 'DESC')
+            ->findAll();
+
+        // 4. Kirim semua data ke file view 'detail_place.php'
+        return view('detail_place', $data);
     }
 
     public function store()
@@ -74,6 +161,9 @@ class Place extends BaseController
         $placeModel = new PlaceModel();
         $photoModel = new \App\Models\PlacePhotoModel();
 
+        // Cek role user yang sedang login. Jika admin langsung approved, jika user biasa status pending
+        $status = (session()->get('role') === 'admin') ? 'approved' : 'pending';
+
         // Simpan data teks & koordinat ke tabel places
         $placeModel->insert([
             'category_id' => $this->request->getPost('category_id'),
@@ -81,6 +171,7 @@ class Place extends BaseController
             'address'     => $this->request->getPost('address'),
             'latitude'    => $this->request->getPost('latitude'),
             'longitude'   => $this->request->getPost('longitude'),
+            'status'      => $status
         ]);
 
         // Ambil ID tempat kuliner yang baru saja disimpan
@@ -115,7 +206,12 @@ class Place extends BaseController
             }
         }
 
-        return redirect()->to('/')->with('success', 'Tempat kuliner berhasil ditambahkan beserta tag!');
+        // Custom flashdata message berdasarkan status approval
+        $message = ($status === 'pending')
+            ? 'Tempat kuliner berhasil diajukan! Menunggu validasi dan persetujuan dari Admin.'
+            : 'Tempat kuliner berhasil ditambahkan beserta tag!';
+
+        return redirect()->to('/')->with('success', $message);
     }
 
     // Menyimpan data review & rating ke database
@@ -172,7 +268,7 @@ class Place extends BaseController
         $reviewModel->where('place_id', $id)->delete();
         $placeModel->delete($id);
 
-        return redirect()->to('/');
+        return redirect()->to('/admin/places')->with('success', 'Tempat kuliner berhasil dihapus.');
     }
 
     // Menampilkan form edit data
@@ -209,7 +305,7 @@ class Place extends BaseController
     // Memproses perubahan data ke database
     public function update($id)
     {
-        $placeModel = new \App\Models\PlaceModel();
+        $placeModel = new PlaceModel();
 
         // Ambil data post dan pastikan category_id ikut ditangkap
         $placeModel->update($id, [
@@ -226,7 +322,7 @@ class Place extends BaseController
         $tagModel->syncPlaceTags($id, $selectedTags);
         // =====================================================================
 
-        return redirect()->to('/')->with('success', 'Data tempat kuliner berhasil diperbarui.');
+        return redirect()->to('/tempat/' . $id)->with('success', 'Data tempat berhasil diperbarui.');
     }
 
     public function deleteReview($id)
@@ -320,5 +416,62 @@ class Place extends BaseController
 
         $reviewModel->delete($id);
         return redirect()->back()->with('success', 'Ulasan Anda berhasil dihapus.');
+    }
+
+    public function places()
+    {
+        // Mengambil semua data dari Model tempat kuliner
+        $placeModel = new \App\Models\PlaceModel();
+
+        $data = [
+            'title'  => 'Kelola Tempat Kuliner',
+            'places' => $placeModel->findAll() // Mengambil semua data tempat
+        ];
+
+        // Memanggil file view yang ada di folder Views/admin/places.php
+        return view('admin/places', $data);
+    }
+
+    // Menampilkan halaman antrean validasi tempat bagi Admin
+    public function validations()
+    {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/')->with('error', 'Akses ditolak! Menu khusus Admin.');
+        }
+
+        $placeModel = new \App\Models\PlaceModel();
+
+        $data = [
+            'title'  => 'Validasi Tempat Kuliner',
+            'places' => $placeModel->where('status', 'pending')->findAll()
+        ];
+
+        return view('admin/validasi_tempat', $data);
+    }
+
+    // Menyetujui tempat kuliner (mengubah status ke approved)
+    public function approvePlace($id)
+    {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/')->with('error', 'Akses ditolak!');
+        }
+
+        $placeModel = new \App\Models\PlaceModel();
+        $placeModel->update($id, ['status' => 'approved']);
+
+        return redirect()->back()->with('success', 'Tempat kuliner berhasil disetujui dan dipublikasikan.');
+    }
+
+    // Menolak tempat kuliner (menghapus pengajuan)
+    public function rejectPlace($id)
+    {
+        if (session()->get('role') !== 'admin') {
+            return redirect()->to('/')->with('error', 'Akses ditolak!');
+        }
+
+        $placeModel = new \App\Models\PlaceModel();
+        $placeModel->delete($id);
+
+        return redirect()->back()->with('success', 'Pengajuan tempat kuliner ditolak dan dihapus.');
     }
 }

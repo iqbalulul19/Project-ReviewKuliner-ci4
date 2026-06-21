@@ -26,6 +26,8 @@ $routes->post('/auth/saveRegister', 'Auth::saveRegister');
 $routes->group('', ['filter' => 'auth'], function ($routes) {
 
     // Fitur Manajemen Tempat Kuliner oleh User
+
+    $routes->get('/tempat/(:num)', 'Place::detail/$1');
     $routes->get('tambah-kuliner', 'Place::create');
     $routes->post('place/store', 'Place::store');
     $routes->post('place/searchNominatim', 'Place::searchNominatim');
@@ -52,7 +54,11 @@ $routes->group('', ['filter' => 'auth'], function ($routes) {
 // ====================================================================
 $routes->group('admin', ['filter' => 'auth'], function ($routes) {
 
+    // Mengarahkan URL admin/places ke Controller Place dan fungsi places
+    $routes->get('places', 'Place::places');
+
     // Kelola Master Kategori Kuliner (Sinkron dengan CategoryController)
+    $routes->get('/tempat/(:num)', 'Place::detail/$1');
     $routes->get('categories', 'CategoryController::index');
     $routes->post('categories/store', 'CategoryController::store');
     $routes->post('categories/update/(:num)', 'CategoryController::update/$1');
@@ -64,3 +70,18 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('tags/update/(:num)', 'TagController::update/$1');
     $routes->get('tags/delete/(:num)', 'TagController::delete/$1');
 });
+
+// ====================================================================
+// 4. RUTE WEBSERVICE API (Untuk dikonsumsi aplikasi luar / Mobile)
+// ====================================================================
+
+$routes->get('api/docs', 'Api\PlaceApi::docs');
+// PERBAIKAN: Menambahkan filter 'apikey' agar rute ini dikunci
+$routes->group('api', ['filter' => 'apikey'], function ($routes) {
+    // Endpoint GET untuk mengambil semua data tempat
+    $routes->get('places', 'Api\PlaceApi::index');
+});
+
+$routes->get('/admin/validasi', 'Place::validations');
+$routes->get('/admin/validasi/approve/(:num)', 'Place::approvePlace/$1');
+$routes->get('/admin/validasi/reject/(:num)', 'Place::rejectPlace/$1');

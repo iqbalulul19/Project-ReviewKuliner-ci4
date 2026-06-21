@@ -105,10 +105,9 @@
     let alamat = document.getElementById('addressInput').value;
     let status = document.getElementById('statusPencarian');
 
-    if (alamat === '') {
-      alert('Isi alamatnya dulu ya!');
-      return;
-    }
+    // Kosongkan koordinat sebelumnya saat mulai mencari
+    document.getElementById('latitude').value = '';
+    document.getElementById('longitude').value = '';
 
     status.innerHTML = "<i>Sedang mencari koordinat ke Nominatim... ⏳</i>";
 
@@ -122,17 +121,25 @@
       })
       .then(response => response.json())
       .then(data => {
-        if (data && data.length > 0) {
+        // PERBAIKAN: Menangkap response JSON berformat error dari Controller
+        if (data.status === 'error') {
+            status.innerHTML = `<span class='text-danger'><b>${data.message} ❌</b></span>`;
+        } 
+        // Jika sukses, API Nominatim akan mengembalikan array data koordinat
+        else if (data && data.length > 0) {
           document.getElementById('latitude').value = data[0].lat;
           document.getElementById('longitude').value = data[0].lon;
           status.innerHTML = "<span class='text-success'><b>Koordinat berhasil ditemukan! ✅</b></span>";
-        } else {
-          status.innerHTML = "<span class='text-danger'><b>Alamat tidak ditemukan, coba lebih spesifik atau cek koneksi internet. ❌</b></span>";
+        } 
+        // Jaga-jaga jika ada kondisi anomali lainnya
+        else {
+          status.innerHTML = "<span class='text-danger'><b>Alamat tidak ditemukan di peta. ❌</b></span>";
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        status.innerHTML = "<span class='text-danger'><b>Terjadi kesalahan jaringan atau token kedaluwarsa.</b></span>";
+        // Menangkap error jika server mati, internet putus, atau controller gagal dieksekusi
+        status.innerHTML = "<span class='text-danger'><b>Gagal terhubung ke server. Periksa koneksi internetmu. ❌</b></span>";
       });
   });
 </script>
