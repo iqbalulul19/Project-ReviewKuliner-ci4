@@ -286,11 +286,11 @@
                         <li class="mt-4 px-3 mb-1">
                             <small class="text-uppercase" style="color: rgba(255,255,255,0.5); font-weight: 700; font-size: 11px;">Panel Admin</small>
                         </li>
-                        <li class="<?= url_is('admin/places*') ? 'active' : '' ?>">
-                            <a href="/admin/places"><i class="bi bi-shop me-2"></i> Kelola Tempat</a>
-                        </li>
                         <li class="<?= url_is('admin/validasi*') ? 'active' : '' ?>">
                             <a href="/admin/validasi"><i class="bi bi-check2-square me-2"></i> Validasi Tempat</a>
+                        </li>
+                        <li class="<?= url_is('admin/places*') ? 'active' : '' ?>">
+                            <a href="/admin/places"><i class="bi bi-shop me-2"></i> Kelola Tempat</a>
                         </li>
                         <li class="<?= url_is('admin/categories*') ? 'active' : '' ?>">
                             <a href="/admin/categories"><i class="bi bi-grid-fill"></i> Kelola Kategori</a>

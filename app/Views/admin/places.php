@@ -27,9 +27,9 @@
                             <thead class="table-light">
                                 <tr>
                                     <th width="5%">No</th>
-                                    <th width="40%">Nama Tempat</th>
-                                    <th width="25%">Alamat</th>
-                                    <th width="30%" class="text-center">Aksi</th>
+                                    <th width="45%">Nama Tempat</th>
+                                    <th width="30%">Alamat</th>
+                                    <th width="20%" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
