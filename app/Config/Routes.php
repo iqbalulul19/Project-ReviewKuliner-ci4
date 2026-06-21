@@ -80,8 +80,12 @@ $routes->get('api/docs', 'Api\PlaceApi::docs');
 $routes->group('api', ['filter' => 'apikey'], function ($routes) {
     // Endpoint GET untuk mengambil semua data tempat
     $routes->get('places', 'Api\PlaceApi::index');
+
 });
 
 $routes->get('/admin/validasi', 'Place::validations');
 $routes->get('/admin/validasi/approve/(:num)', 'Place::approvePlace/$1');
 $routes->get('/admin/validasi/reject/(:num)', 'Place::rejectPlace/$1');
+
+
+
