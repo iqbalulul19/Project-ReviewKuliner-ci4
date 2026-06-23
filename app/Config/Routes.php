@@ -80,6 +80,8 @@ $routes->get('api/docs', 'Api\PlaceApi::docs');
 $routes->group('api', ['filter' => 'apikey'], function ($routes) {
     // Endpoint GET untuk mengambil semua data tempat
     $routes->get('places', 'Api\PlaceApi::index');
+    $routes->post('places', 'Api\PlaceApi::create');
+    $routes->delete('places/(:num)', 'Api\PlaceApi::delete/$1');
 
 });
 

@@ -110,6 +110,17 @@
         <div class="card shadow-sm border-0 rounded-4 mb-5">
             <div class="card-body p-4">
                 <h5 class="fw-bold mb-4 border-bottom pb-2">💬 Ulasan Pengunjung</h5>
+                <div class="d-flex align-items-center mb-3">
+                    <?php if ($avg_rating > 0) : ?>
+                        <div class="badge bg-warning text-dark fs-6 px-3 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-star-fill text-dark me-1"></i> <?= $avg_rating; ?> / 5.0
+                        </div>
+                    <?php else : ?>
+                        <div class="badge bg-secondary text-white fs-6 px-3 py-2 rounded-pill shadow-sm">
+                            <i class="bi bi-star text-white me-1"></i> Belum ada ulasan
+                        </div>
+                    <?php endif; ?>
+                </div>
                 
                 <?php if(empty($reviews)) : ?>
                     <div class="text-center py-4">

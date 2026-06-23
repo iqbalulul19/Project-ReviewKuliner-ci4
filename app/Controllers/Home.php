@@ -48,6 +48,15 @@ class Home extends BaseController
                 }
             }
 
+            // --- TAMBAHAN KODE RATA-RATA RATING ---
+            // Mengambil nilai rata-rata dari kolom 'rating' di tabel reviews
+            $avgData = $reviewModel->selectAvg('rating')->where('place_id', $place['id'])->first();
+            
+            // Simpan rata-rata ke dalam array (format 1 angka di belakang koma, misal: 4.5)
+            // Jika belum ada rating (null), maka beri nilai 0
+            $places[$key]['avg_rating'] = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
+            // --------------------------------------
+
             $places[$key]['cover_image'] = $cover;
             $places[$key]['cover_path'] = $path;
         }

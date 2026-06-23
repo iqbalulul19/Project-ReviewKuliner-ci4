@@ -37,11 +37,7 @@ class Place extends BaseController
             ]);
         }
 
-        // ================================================================
-        // FITUR CACHE (Syarat Rubrik Poin 5 untuk nilai maksimal 15%)
-        // ================================================================
         $cache = \Config\Services::cache();
-        // Membuat nama kunci cache unik berdasarkan nama alamat
         $cacheKey = 'nominatim_' . md5(strtolower(trim($address)));
 
         // Cek apakah data koordinat alamat ini sudah pernah dicari sebelumnya
@@ -49,7 +45,6 @@ class Place extends BaseController
             // Jika ada di cache, langsung kembalikan datanya (Lebih cepat tanpa perlu hit API lagi!)
             return $this->response->setContentType('application/json')->setBody($cachedData);
         }
-        // ================================================================
 
         $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($address) . "&format=json";
 
@@ -57,7 +52,7 @@ class Place extends BaseController
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'KulinerApp_Mahasiswa/1.0'); // Identitas WAJIB untuk Nominatim
+        curl_setopt($ch, CURLOPT_USERAGENT, 'KulinerApp_Mahasiswa/1.0'); 
 
         // 2. ERROR HANDLING: Batas waktu maksimal koneksi (Timeout) 10 detik
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -126,7 +121,10 @@ class Place extends BaseController
             ->orderBy('reviews.created_at', 'DESC')
             ->findAll();
 
-        // 4. Kirim semua data ke file view 'detail_place.php'
+        $avgData = $reviewModel->selectAvg('rating')->where('place_id', $id)->first();
+        // Jika ada rating, format 1 angka di belakang koma (misal 4.5). Jika tidak ada, beri 0.
+        $data['avg_rating'] = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
+
         return view('detail_place', $data);
     }
 
