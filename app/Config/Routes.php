@@ -80,6 +80,8 @@ $routes->get('api/docs', 'Api\PlaceApi::docs');
 $routes->group('api', ['filter' => 'apikey'], function ($routes) {
     // Endpoint GET untuk mengambil semua data tempat
     $routes->get('places', 'Api\PlaceApi::index');
+    $routes->post('places', 'Api\PlaceApi::create');
+    $routes->delete('places/(:num)', 'Api\PlaceApi::delete/$1');
 
 });
 
@@ -87,5 +89,8 @@ $routes->get('/admin/validasi', 'Place::validations');
 $routes->get('/admin/validasi/approve/(:num)', 'Place::approvePlace/$1');
 $routes->get('/admin/validasi/reject/(:num)', 'Place::rejectPlace/$1');
 
-
-
+// Routes untuk fitur Favorit
+// Fitur Favorit
+$routes->get('favorit', 'FavoriteController::index');
+$routes->post('favorit/add/(:num)', 'FavoriteController::add/$1');       // Rute khusus tambah
+$routes->post('favorit/delete/(:num)', 'FavoriteController::delete/$1'); 

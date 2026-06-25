@@ -21,11 +21,9 @@
            ========================================= */
         body {
             background-color: #F4F7F7;
-            /* Abu-abu kebiruan sangat terang agar konten mudah dibaca */
             font-family: 'Poppins', sans-serif;
             overflow: hidden;
             color: #2c3e3e;
-            /* Teks gelap */
         }
 
         #wrapper {
@@ -39,7 +37,6 @@
            ========================================= */
         .btn-primary {
             background-color: #249E94 !important;
-            /* Teal sedang */
             border-color: #249E94 !important;
             color: #fff !important;
             font-weight: 500;
@@ -47,13 +44,11 @@
 
         .btn-primary:hover {
             background-color: #0C7779 !important;
-            /* Teal lebih gelap saat di-hover */
             border-color: #0C7779 !important;
         }
 
         .btn-warning {
             background-color: #249E94 !important;
-            /* Warna Edit */
             border-color: #249E94 !important;
             color: #fff !important;
         }
@@ -66,7 +61,6 @@
 
         .btn-danger {
             background-color: #005461 !important;
-            /* Warna Hapus */
             border-color: #005461 !important;
             color: #fff !important;
         }
@@ -94,10 +88,8 @@
            ========================================= */
         #sidebar {
             min-width: 240px;
-            /* Tambah 20px agar lebih lega */
             max-width: 240px;
             background: #005461;
-            /* Teal Paling Gelap */
             transition: all 0.3s;
             overflow-y: auto;
             display: flex;
@@ -113,7 +105,6 @@
             align-items: center;
             justify-content: center;
             background: #0C7779;
-            /* Teal Gelap */
             color: #fff;
             font-size: 1.2rem;
             border-bottom: 1px solid #00424d;
@@ -125,7 +116,6 @@
 
         #sidebar .sidebar-header .text-warning {
             color: #3BC1A8 !important;
-            /* Mint/Hijau terang sebagai aksen yang nyala */
         }
 
         #sidebar ul.components {
@@ -134,7 +124,6 @@
             border-bottom: none !important;
         }
 
-        /* CSS Sidebar yang dikunci agar posisi teks stabil */
         #sidebar ul li a {
             padding: 12px 15px;
             margin: 0 15px 5px 15px;
@@ -144,15 +133,10 @@
             color: #ffffff !important;
             text-decoration: none;
             transition: background 0.2s;
-            /* Hanya transisi background saja */
             font-weight: 500;
-            /* Tetap 500 */
             white-space: nowrap;
-            /* Mencegah teks turun ke bawah */
             overflow: hidden;
-            /* Menyembunyikan jika teks terlalu panjang */
             text-overflow: ellipsis;
-            /* Memberikan titik-titik jika teks kepanjangan */
         }
 
         #sidebar ul li a:hover,
@@ -160,7 +144,6 @@
             color: #005461 !important;
             background: #ffffff !important;
             font-weight: 500;
-            /* TETAP 500, jangan diubah */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
@@ -188,7 +171,6 @@
             min-height: 70px !important;
             max-height: 70px !important;
             background: #ffffff;
-            /* Navbar tetap putih agar bersih */
             padding: 0 25px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
             display: flex;
@@ -199,7 +181,6 @@
             border-bottom: 1px solid #e0e6e6;
         }
 
-        /* Tambahan untuk Form agar seragam dengan tema Teal */
         .card-header {
             background-color: #0C7779 !important;
             color: #fff !important;
@@ -232,9 +213,7 @@
 
         .btn-outline-primary {
             color: #249E94 !important;
-            /* Warna teks Teal */
             border-color: #249E94 !important;
-            /* Warna garis Teal */
             background-color: transparent !important;
         }
 
@@ -242,12 +221,9 @@
         .btn-outline-primary:focus,
         .btn-outline-primary:active {
             color: #ffffff !important;
-            /* Teks jadi putih saat dihover/diklik */
             background-color: #249E94 !important;
-            /* Background jadi Teal saat dihover/diklik */
             border-color: #249E94 !important;
             box-shadow: 0 0 0 0.25rem rgba(36, 158, 148, 0.25) !important;
-            /* Efek bayangan saat diklik */
         }
 
         .modal-header.bg-primary {
@@ -259,7 +235,6 @@
             outline: none !important;
             box-shadow: none !important;
             border: 1px solid #ced4da;
-            /* Kembali ke warna border asli */
         }
     </style>
 </head>
@@ -281,6 +256,14 @@
                     <li class="mt-2 <?= url_is('tambah-kuliner') ? 'active' : '' ?>">
                         <a href="/tambah-kuliner" style="color: #3BC1A8; font-weight: 600;"><i class="bi bi-plus-circle-fill"></i> Tambah Tempat</a>
                     </li>
+
+                    <?php if (session()->get('role') !== 'admin') : ?>
+                        <li class="<?= url_is('favorit') ? 'active' : '' ?>">
+                            <a href="/favorit" style="font-weight: 600;">
+                                <i class="bi bi-heart-fill" style="color: #ffffff;"></i> Favorit Saya
+                            </a>
+                        </li>
+                    <?php endif; ?>
 
                     <?php if (session()->get('role') === 'admin') : ?>
                         <li class="mt-4 px-3 mb-1">

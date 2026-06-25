@@ -132,6 +132,12 @@
                     <p class="card-text text-muted small text-truncate mb-0">
                         <i class="bi bi-geo-alt-fill text-danger"></i> <?= esc($place['address']); ?>
                     </p>
+                    <?php if ($place['avg_rating'] > 0) : ?>
+                        <span class="text-warning fw-bold"><i class="bi bi-star-fill"></i> <?= $place['avg_rating']; ?></span>
+                        <span class="text-muted small">/ 5.0</span>
+                    <?php else : ?>
+                        <span class="text-muted small"><i>Belum ada ulasan</i></span>
+                    <?php endif; ?>
                 </div>
                 
                 <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">

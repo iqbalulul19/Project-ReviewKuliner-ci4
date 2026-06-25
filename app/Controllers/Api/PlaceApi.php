@@ -58,4 +58,61 @@ class PlaceApi extends ResourceController
 
     return $this->respond($docs, 200);
     }
+
+    public function create()
+    {
+        $placeModel = new PlaceModel();
+
+        // Tangkap data yang dikirimkan via API
+        $data = [
+            'name'        => $this->request->getVar('name'),
+            'category_id' => $this->request->getVar('category_id'),
+            'address'     => $this->request->getVar('address'),
+            'latitude'    => $this->request->getVar('latitude'),
+            'longitude'   => $this->request->getVar('longitude'),
+            'status'      => 'approved'
+        ];
+
+        // Validasi sederhana
+        if (empty($data['name']) || empty($data['address'])) {
+            return $this->respond([
+                'status'  => 400,
+                'message' => 'Gagal! Nama dan Alamat wajib diisi.'
+            ], 400);
+        }
+
+        // Simpan ke database
+        if ($placeModel->insert($data)) {
+            return $this->respondCreated([
+                'status'  => 201,
+                'message' => 'Berhasil menambahkan data tempat kuliner baru via API',
+                'data'    => $data
+            ]);
+        }
+
+        return $this->respond([
+            'status'  => 500,
+            'message' => 'Gagal menyimpan data ke database.'
+        ], 500);
+    }
+
+    public function delete($id = null)
+    {
+        $placeModel = new PlaceModel();
+
+        $data = $placeModel->find($id);
+        
+        if ($data) {
+            $placeModel->delete($id);
+            return $this->respondDeleted([
+                'status'  => 200,
+                'message' => 'Data tempat kuliner dengan ID ' . $id . ' berhasil dihapus via API.'
+            ]);
+        }
+
+        return $this->respond([
+            'status'  => 404,
+            'message' => 'Data tidak ditemukan. Hapus dibatalkan.'
+        ], 404);
+    }
 }
