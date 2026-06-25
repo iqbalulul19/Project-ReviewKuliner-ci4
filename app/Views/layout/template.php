@@ -260,7 +260,7 @@
                     <?php if (session()->get('role') !== 'admin') : ?>
                         <li class="<?= url_is('favorit') ? 'active' : '' ?>">
                             <a href="/favorit" style="font-weight: 600;">
-                                <i class="bi bi-heart-fill" style="color: #ffffff;"></i> Favorit Saya
+                                <i class="bi bi-heart-fill" ></i> Favorit Saya
                             </a>
                         </li>
                     <?php endif; ?>

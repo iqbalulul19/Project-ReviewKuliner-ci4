@@ -1,7 +1,9 @@
 <?= $this->extend('layout/template'); ?>
 
 <?= $this->section('content'); ?>
-<div class="row justify-content-center mt-4">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+<div class="row justify-content-center mt-4 mb-5">
   <div class="col-md-8">
     <div class="card shadow-sm border-0 rounded-4">
       <div class="card-header bg-primary text-white py-3 rounded-top-4">
@@ -52,7 +54,7 @@
                 <?php foreach ($tags as $tag) : ?>
                   <div class="form-check">
                     <input class="form-check-input" type="checkbox" name="tags[]" value="<?= $tag['id']; ?>" id="tag_<?= $tag['id']; ?>">
-                    <label class="form-check-label" Create for="tag_<?= $tag['id']; ?>">
+                    <label class="form-check-label" for="tag_<?= $tag['id']; ?>">
                       <?= esc($tag['name']); ?>
                     </label>
                   </div>
@@ -85,6 +87,11 @@
           </div>
 
           <div class="mb-4">
+            <label class="form-label fw-bold">Preview Lokasi Peta</label>
+            <div id="mapPreview" style="height: 350px; width: 100%; border-radius: 8px; z-index: 1;"></div>
+          </div>
+
+          <div class="mb-4">
             <label class="form-label fw-bold">Upload Foto (Maksimal 3)</label>
             <input type="file" name="photos[]" class="form-control" multiple accept="image/*">
             <small class="text-muted">Bisa pilih lebih dari 1 foto. Otomatis di-resize maks 800px.</small>
@@ -100,15 +107,50 @@
 <?= $this->endSection(); ?>
 
 <?= $this->section('scripts'); ?>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
 <script>
+  // Inisialisasi Peta (Default map terpusat di Semarang, TAPI TANPA MARKER)
+  let initialLat = -6.9932;
+  let initialLng = 110.4203;
+  let zoomLevel = 13;
+
+  const map = L.map('mapPreview').setView([initialLat, initialLng], zoomLevel);
+
+  // Load tile layer dari OpenStreetMap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  // 1. Set variabel marker jadi kosong (null) di awal
+  let marker = null;
+
+  // 2. Buat fungsi untuk memunculkan atau memindahkan marker
+  function setMapMarker(lat, lng) {
+    if (marker !== null) {
+      // Jika marker sudah ada sebelumnya, cukup pindahkan lokasinya
+      marker.setLatLng([lat, lng]);
+    } else {
+      // Jika marker belum ada (pencarian pertama kali), buat marker baru, atur draggable menjadi false
+      marker = L.marker([lat, lng], { draggable: false }).addTo(map);
+    }
+    // Arahkan & zoom peta ke titik baru tersebut
+    map.setView([lat, lng], 17);
+  }
+
+  // Logika pencarian koordinat via Nominatim
   document.getElementById('btnCariKoordinat').addEventListener('click', function() {
     let alamat = document.getElementById('addressInput').value;
     let status = document.getElementById('statusPencarian');
 
-    // Kosongkan koordinat sebelumnya saat mulai mencari
+    if (alamat.trim() === '') {
+      status.innerHTML = "<span class='text-danger'><b>Silakan isi alamat terlebih dahulu. ❌</b></span>";
+      return;
+    }
+
     document.getElementById('latitude').value = '';
     document.getElementById('longitude').value = '';
-
     status.innerHTML = "<i>Sedang mencari koordinat ke Nominatim... ⏳</i>";
 
     let formData = new FormData();
@@ -121,24 +163,27 @@
       })
       .then(response => response.json())
       .then(data => {
-        // PERBAIKAN: Menangkap response JSON berformat error dari Controller
         if (data.status === 'error') {
             status.innerHTML = `<span class='text-danger'><b>${data.message} ❌</b></span>`;
         } 
-        // Jika sukses, API Nominatim akan mengembalikan array data koordinat
         else if (data && data.length > 0) {
-          document.getElementById('latitude').value = data[0].lat;
-          document.getElementById('longitude').value = data[0].lon;
+          let lat = parseFloat(data[0].lat);
+          let lon = parseFloat(data[0].lon);
+
+          // Update input field
+          document.getElementById('latitude').value = lat;
+          document.getElementById('longitude').value = lon;
           status.innerHTML = "<span class='text-success'><b>Koordinat berhasil ditemukan! ✅</b></span>";
+
+          // Panggil fungsi untuk menampilkan titik di peta
+          setMapMarker(lat, lon);
         } 
-        // Jaga-jaga jika ada kondisi anomali lainnya
         else {
           status.innerHTML = "<span class='text-danger'><b>Alamat tidak ditemukan di peta. ❌</b></span>";
         }
       })
       .catch(error => {
         console.error('Error:', error);
-        // Menangkap error jika server mati, internet putus, atau controller gagal dieksekusi
         status.innerHTML = "<span class='text-danger'><b>Gagal terhubung ke server. Periksa koneksi internetmu. ❌</b></span>";
       });
   });

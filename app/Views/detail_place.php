@@ -17,7 +17,7 @@
             </div>
 
             <div class="mt-4 pt-2">
-                <?php if (session()->get('logged_in')): ?>
+                <?php if (session()->get('logged_in') && session()->get('role') !== 'admin'): ?>
                     <?php
                     // Cek ke database apakah tempat ini sudah difavoritkan oleh user yang sedang login
                     $favModel = new \App\Models\FavoriteModel();
