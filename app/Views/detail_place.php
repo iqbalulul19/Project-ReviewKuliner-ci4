@@ -146,7 +146,10 @@
                     <?php endif; ?>
                 </div>
 
-                <?php if (empty($reviews)) : ?>
+
+                
+                <?php if(empty($reviews)) : ?>
+
                     <div class="text-center py-4">
                         <p class="text-muted mb-0">Belum ada ulasan. Jadilah yang pertama memberikan ulasan!</p>
                     </div>
