@@ -174,7 +174,6 @@
             padding: 0 25px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
             display: flex;
-            justify-content: flex-end;
             align-items: center;
             z-index: 10;
             box-sizing: border-box;
@@ -236,11 +235,58 @@
             box-shadow: none !important;
             border: 1px solid #ced4da;
         }
+
+        /* =========================================
+           5. RESPONSIVE & MOBILE ADAPTATION
+           ========================================= */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                height: 100vh;
+                z-index: 1050;
+                transform: translateX(-100%);
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+            }
+
+            #sidebar.active {
+                transform: translateX(0);
+            }
+
+            #content {
+                width: 100%;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .top-navbar {
+                padding: 0 15px;
+            }
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            top: 0;
+            left: 0;
+            transition: all 0.3s;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
     </style>
 </head>
 
 <body>
     <div id="wrapper">
+
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <nav id="sidebar">
             <div class="sidebar-header fw-bold">
@@ -261,6 +307,7 @@
                         <li class="<?= url_is('favorit') ? 'active' : '' ?>">
                             <a href="/favorit" style="font-weight: 600;">
                                 <i class="bi bi-heart-fill" ></i> Favorit Saya
+
                             </a>
                         </li>
                     <?php endif; ?>
@@ -303,10 +350,14 @@
 
         <div id="content">
             <div class="top-navbar">
-                <div class="d-flex align-items-center">
+                <button class="btn btn-outline-primary d-md-none" id="sidebarToggle">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+
+                <div class="d-flex align-items-center ms-auto">
                     <?php if (session()->get('logged_in')): ?>
                         <a href="/profile" class="btn btn-light border rounded-pill d-flex align-items-center shadow-sm px-3 py-1 text-decoration-none" style="background-color: #fff; border-color: #e0e6e6 !important;">
-                            <span class="fw-bold me-2" style="color: #005461;">Halo, <?= esc(session()->get('name')); ?></span>
+                            <span class="fw-bold me-2 d-none d-sm-inline" style="color: #005461;">Halo, <?= esc(session()->get('name')); ?></span>
                             <i class="bi bi-person-circle fs-4 text-primary"></i>
                         </a>
                     <?php else: ?>
@@ -330,6 +381,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 
     <script>
+        // Back to top button logic
         let mybutton = document.getElementById("btn-back-to-top");
         let mainContent = document.querySelector('.main-content');
 
@@ -348,6 +400,28 @@
                 });
             });
         }
+
+        // Logika untuk Sidebar Mobile
+        document.addEventListener("DOMContentLoaded", function() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.getElementById('sidebarToggle');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                });
+            }
+
+            // Tutup sidebar jika user klik di area gelap (overlay)
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+        });
     </script>
 
     <?= $this->renderSection('scripts'); ?>
