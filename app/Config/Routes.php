@@ -94,3 +94,11 @@ $routes->get('/admin/validasi/reject/(:num)', 'Place::rejectPlace/$1');
 $routes->get('favorit', 'FavoriteController::index');
 $routes->post('favorit/add/(:num)', 'FavoriteController::add/$1');       // Rute khusus tambah
 $routes->post('favorit/delete/(:num)', 'FavoriteController::delete/$1'); 
+
+$routes->post('checkout/voucher/(:num)', 'CheckoutVoucher::process/$1');
+
+$routes->get('checkout/confirm/(:num)', 'DokuCheckout::confirm/$1');
+$routes->post('doku-checkout/process/(:num)', 'DokuCheckout::process/$1');
+$routes->post('doku/callback', 'DokuNotification::callback');
+$routes->post('doku/notification', 'DokuNotification::index');
+$routes->get('checkout/success', 'DokuCheckout::success');

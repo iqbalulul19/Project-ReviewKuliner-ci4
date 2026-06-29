@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\PlaceModel;
 use App\Models\PlacePhotoModel;
 use App\Models\ReviewModel;
+use App\Models\VoucherModel;
 
 class Place extends BaseController
 {
@@ -98,35 +99,51 @@ class Place extends BaseController
 
     // Menampilkan halaman detail tempat kuliner beserta fotonya
     public function detail($id)
-    {
-        $placeModel = new \App\Models\PlaceModel();
-        $photoModel = new \App\Models\PlacePhotoModel();
-        $reviewModel = new \App\Models\ReviewModel();
+{
+    $placeModel = new \App\Models\PlaceModel();
+    $photoModel = new \App\Models\PlacePhotoModel();
+    $reviewModel = new \App\Models\ReviewModel();
+    $voucherModel = new \App\Models\VoucherModel();
+    $tagModel = new \App\Models\TagModel(); // Pastikan model tag dipanggil
 
-        // 1. Ambil data tempat berdasarkan ID
-        $data['place'] = $placeModel->find($id);
+    // 1. Ambil data tempat
+    $place = $placeModel->find($id);
 
-        // Jika ID tempat tidak ada di database, munculkan halaman 404
-        if (!$data['place']) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Tempat kuliner tidak ditemukan di database!");
-        }
+    if (!$place) {
+        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Tempat kuliner tidak ditemukan!");
+    }
 
-        // 2. Ambil semua foto yang terkait dengan tempat ini
-        $data['photos'] = $photoModel->where('place_id', $id)->findAll();
-
-        // 3. Ambil data ulasan (review) beserta NAMA user-nya
-        $data['reviews'] = $reviewModel->select('reviews.*, users.name')
+    // 2. Ambil data pendukung
+    $photos = $photoModel->where('place_id', $id)->findAll();
+    $reviews = $reviewModel->select('reviews.*, users.name')
             ->join('users', 'users.id = reviews.user_id')
             ->where('place_id', $id)
             ->orderBy('reviews.created_at', 'DESC')
             ->findAll();
+    
+    // Ambil rata-rata rating
+    $avgData = $reviewModel->selectAvg('rating')->where('place_id', $id)->first();
+    $avgRating = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
 
-        $avgData = $reviewModel->selectAvg('rating')->where('place_id', $id)->first();
-        // Jika ada rating, format 1 angka di belakang koma (misal 4.5). Jika tidak ada, beri 0.
-        $data['avg_rating'] = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
+    // Ambil voucher
+    $vouchers = $voucherModel->getActiveVouchers($id);
 
-        return view('detail_place', $data);
-    }
+    // Ambil tag (asumsi kamu punya cara ambil tag berdasarkan tempat)
+    // Jika belum ada, sesuaikan dengan logic yang sudah kamu buat sebelumnya
+    $tags = []; 
+
+    // 3. Gabungkan ke dalam satu array $data
+    $data = [
+        'place'      => $place,
+        'photos'     => $photos,
+        'reviews'    => $reviews,
+        'tags'       => $tags,
+        'avg_rating' => $avgRating,
+        'vouchers'   => $vouchers
+    ];
+
+    return view('detail_place', $data);
+}
 
     public function store()
     {

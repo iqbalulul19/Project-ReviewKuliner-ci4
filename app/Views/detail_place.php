@@ -91,6 +91,46 @@
             </div>
         </div>
 
+        <?php if (!empty($vouchers)): ?>
+        <div class="card shadow-sm border-0 rounded-4 mb-4" style="background: linear-gradient(135deg, #0C7779, #249E94);">
+            <div class="card-body p-4 text-white">
+                <h5 class="fw-bold mb-3 border-bottom border-light pb-2"><i class="bi bi-ticket-perforated-fill"></i> Promo Spesial!</h5>
+                
+                <div class="row g-3">
+                    <?php foreach ($vouchers as $v): ?>
+                        <div class="col-md-6">
+                            <div class="card bg-white text-dark rounded-3 shadow-sm h-100">
+                                <div class="card-body d-flex flex-column">
+                                    <h6 class="fw-bold text-primary mb-1"><?= esc($v['title']); ?></h6>
+                                    <p class="small text-muted mb-2"><?= esc($v['description']); ?></p>
+                                    
+                                    <div class="mt-auto d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <small class="text-muted d-block">Harga Beli</small>
+                                            <span class="fw-bold text-danger fs-5">Rp <?= number_format($v['price'], 0, ',', '.'); ?></span>
+                                        </div>
+                                        
+                                        <?php if(session()->get('logged_in')): ?>
+    <!-- Arahkan ke halaman konfirmasi -->
+    <a href="/checkout/confirm/<?= $v['id']; ?>" class="btn btn-warning fw-bold btn-sm rounded-pill px-3 shadow-sm">
+        Beli Sekarang
+    </a>
+<?php else: ?>
+                                            <a href="/login" class="btn btn-outline-secondary btn-sm rounded-pill">Login untuk beli</a>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="mt-2 text-end">
+                                        <small class="text-success fw-bold"><i class="bi bi-fire"></i> Sisa: <?= $v['stock']; ?> voucher</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
+
         <div class="card shadow-sm border-0 rounded-4 mb-4" style="background-color: #f8f9fa;">
             <div class="card-body p-4">
                 <h5 class="fw-bold mb-3">✍️ Tulis Ulasanmu</h5>
