@@ -8,22 +8,30 @@ use App\Models\PlaceModel;
 
 class DokuCheckout extends BaseController
 {
-    // Fungsi confirm tetap sama
-    public function confirm($voucher_id) {
-        $vModel = new VoucherModel();
-        $voucher = $vModel->find($voucher_id);
-        
+    public function confirm($id)
+    {
+        // 1. Panggil Model
+        $voucherModel = new \App\Models\VoucherModel();
+        $placeModel = new \App\Models\PlaceModel();
+
+        // 2. Cari data voucher berdasarkan ID yang diklik
+        $voucher = $voucherModel->find($id);
+
+        // Jika voucher tidak ada/salah URL, kembalikan ke halaman utama
         if (!$voucher) {
-            return redirect()->back()->with('error', 'Voucher tidak ditemukan');
+            return redirect()->to('/')->with('error', 'Voucher tidak ditemukan.');
         }
 
-        $pModel = new PlaceModel();
-        $place = $pModel->find($voucher['place_id']);
+        // 3. Cari data tempat kuliner berdasarkan place_id yang ada di tabel voucher
+        $place = $placeModel->find($voucher['place_id']);
 
-        return view('checkout_confirm', [
+        // 4. Kirim kedua data tersebut ke View
+        $data = [
             'voucher' => $voucher,
             'place'   => $place
-        ]);
+        ];
+
+        return view('checkout_confirm', $data); // Sesuaikan dengan nama view milikmu
     }
 
     // Fungsi proses menggunakan API langsung (CURL CI4)
@@ -52,7 +60,6 @@ class DokuCheckout extends BaseController
         $sharedKey  = env('DOKU_SHARED_KEY');
         $targetPath = '/checkout/v1/payment';
         $url        = 'https://api-sandbox.doku.com' . $targetPath;
-        
         $requestId  = time() . rand(100, 999); // ID Request unik
         $timestamp  = gmdate("Y-m-d\TH:i:s\Z"); // Waktu standar UTC
 
@@ -62,8 +69,8 @@ class DokuCheckout extends BaseController
                 'amount'         => (int)$voucher['price'],
                 'invoice_number' => $invoiceNumber,
                 'currency'       => 'IDR',
-                // URL untuk mengembalikan user ke aplikasimu setelah bayar
-                'callback_url'   => 'https://antiquity-arose-fit.ngrok-free.dev/checkout/success' 
+                // UBAH BARIS INI: Tambahkan garis miring (/) dan variabel $invoiceNumber
+                'callback_url'   => 'https://antiquity-arose-fit.ngrok-free.dev/checkout/success/' . $invoiceNumber 
             ],
             'payment' => [
                 'payment_due_date' => 60 
@@ -72,7 +79,6 @@ class DokuCheckout extends BaseController
                 'name'  => session()->get('name') ?? 'Guest',
                 'email' => session()->get('email') ?? 'guest@example.com'
             ],
-            // Memaksa DOKU mengirim webhook ke Ngrok kita
             'notify_url' => 'https://antiquity-arose-fit.ngrok-free.dev/doku/notification'
         ];
 
@@ -101,13 +107,12 @@ class DokuCheckout extends BaseController
                     'Content-Type'      => 'application/json'
                 ],
                 'body' => $bodyJson,
-                'http_errors' => false // Biarkan CI4 menangkap pesan error dari DOKU
+                'http_errors' => false 
             ]);
 
             // 6. Baca Balasan dari DOKU
             $result = json_decode($response->getBody(), true);
             
-            // Jika sukses, DOKU akan memberikan URL Halaman Pembayaran
             if (isset($result['response']['payment']['url'])) {
                 return redirect()->to($result['response']['payment']['url']);
             } else {
@@ -119,52 +124,65 @@ class DokuCheckout extends BaseController
         }
     }
 
-   public function success()
+   // Tambahkan parameter $invoiceNumber di dalam kurung
+// Tambahkan parameter $invoiceNumber di dalam kurung
+public function success($order_id = null) 
 {
-    $uvModel = new \App\Models\UserVoucherModel();
-    $vModel  = new \App\Models\VoucherModel();
-    
-    // 1. Ambil Nama User dari Session (Jika tidak ada, tampilkan 'Guest')
-    $customerName = session()->get('name') ?? 'Guest';
-    $userId = session()->get('user_id');
-
-    $amount = 0;
-    $orderId = '-';
-
-    // 2. Cari transaksi TERAKHIR milik user ini
-    $latestTransaction = $uvModel->where('user_id', $userId)
-                                 ->orderBy('id', 'DESC')
-                                 ->first();
-
-    if ($latestTransaction) {
-        $orderId = $latestTransaction['order_id'];
-        
-        // Ambil data harga voucher
-        $voucher = $vModel->find($latestTransaction['voucher_id']);
-        if ($voucher) {
-            $amount = $voucher['price']; // Sesuaikan dengan nama kolom hargamu
-        }
-
-        if ($latestTransaction['status'] === 'pending') {
-            $uvModel->update($latestTransaction['id'], [
-                'status' => 'paid'
-            ]);
-
-            if ($voucher && isset($voucher['stock']) && $voucher['stock'] > 0) {
-                $vModel->update($voucher['id'], [
-                    'stock' => $voucher['stock'] - 1
-                ]);
-            }
-        }
+    // Jika tidak ada order_id di URL, tendang ke halaman awal
+    if (!$order_id) {
+        return redirect()->to('/');
     }
 
-    // 4. Bungkus data untuk dikirim ke View
-    $data = [
-        'customerName' => $customerName,
-        'orderId'      => $orderId,
-        'amount'       => $amount
-    ];
+    $uvModel = new \App\Models\UserVoucherModel();
+    $voucherModel = new \App\Models\VoucherModel();
+    $userModel = new \App\Models\UserModel(); 
 
-    return view('checkout_success', $data);
+    // 1. Cari transaksi yang SANGAT SPESIFIK berdasarkan order_id dari URL
+    $transaction = $uvModel->where('order_id', $order_id)->first();
+
+    if (!$transaction) {
+        return redirect()->to('/');
+    }
+
+    if ($transaction['status'] === 'pending') {
+        $uvModel->update($transaction['id'], [
+            'status' => 'paid'
+        ]);
+        
+        $transaction['status'] = 'paid';
+    }
+
+    // 2. Ambil detail voucher & data pembeli asli dari database
+    $voucher = $voucherModel->find($transaction['voucher_id']);
+    $pembeli = $userModel->find($transaction['user_id']); 
+
+    // 3. Kirim data pasti ke View
+    $data = [
+        'customer_name' => $pembeli['name'] ?? 'Guest', 
+        'order_id'      => $transaction['order_id'],
+        'amount'        => $voucher['price'] ?? 0,
+        'status'        => $transaction['status']
+    ];
+    
+    return view('checkout_success', $data); 
 }
+
+    public function cancel()
+    {
+        $uvModel = new \App\Models\UserVoucherModel();
+        $userId = session()->get('user_id');
+        // 1. Cari transaksi terakhir milik user ini yang masih berstatus 'pending'
+        $pendingTransaction = $uvModel->where('user_id', $userId)
+                                      ->where('status', 'pending')
+                                      ->orderBy('id', 'DESC')
+                                      ->first();
+        // 2. Jika ketemu, ubah statusnya menjadi 'cancelled' agar riwayatnya jelas
+        if ($pendingTransaction) {
+            $uvModel->update($pendingTransaction['id'], [
+                'status' => 'cancelled' 
+            ]);
+        }
+        // 3. Arahkan user kembali ke halaman utama dengan pesan pemberitahuan
+        return redirect()->to('/')->with('error', 'Pembayaran telah dibatalkan.');
+    }
 }

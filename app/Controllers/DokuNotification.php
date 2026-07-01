@@ -1,43 +1,42 @@
 <?php
 
 namespace App\Controllers;
-
 use App\Models\UserVoucherModel;
 
 class DokuNotification extends BaseController
 {
     public function index()
     {
-        // 1. Ambil data JSON yang dikirim oleh server DOKU
         $rawPayload = file_get_contents('php://input');
+        
+        // Cek file ini di folder 'writable/logs/' nanti
+        log_message('error', 'DOKU_DEBUG: Notifikasi diterima. Payload: ' . $rawPayload);
+
         $payload = json_decode($rawPayload, true);
 
-        // Jika tidak ada data, tolak request
+        // Jika JSON tidak valid, hentikan
         if (!$payload) {
+            log_message('error', 'DOKU_DEBUG: Payload kosong atau tidak valid.');
             return $this->response->setStatusCode(400)->setBody('Invalid Payload');
         }
 
-        // 2. Cek apakah status transaksi dari DOKU adalah SUCCESS
+        // Cek status SUCCESS
         if (isset($payload['transaction']['status']) && $payload['transaction']['status'] === 'SUCCESS') {
-            
-            // Ambil Invoice Number (Order ID) yang dikirim DOKU
-            $invoiceNumber = $payload['order']['invoice_number'];
-
+            $order_id = $payload['order']['invoice_number'];
             $uvModel = new UserVoucherModel();
             
-            // 3. Cari data transaksi di database berdasarkan Order ID
-            $transaction = $uvModel->where('order_id', $invoiceNumber)->first();
+            // Cari data di database
+            $transaction = $uvModel->where('order_id', $order_id)->first();
 
-            // 4. Jika transaksi ditemukan dan masih pending, ubah jadi paid
-            if ($transaction && $transaction['status'] === 'pending') {
-                $uvModel->update($transaction['id'], [
-                    'status' => 'paid'
-                ]);
+            if ($transaction) {
+                // Update status
+                $uvModel->update($transaction['id'], ['status' => 'paid']);
+                log_message('error', 'DOKU_DEBUG: Transaksi ' . $order_id . ' berhasil diupdate ke PAID.');
+            } else {
+                log_message('error', 'DOKU_DEBUG: Invoice ' . $order_id . ' TIDAK DITEMUKAN di database.');
             }
         }
 
-        // 5. WAJIB: Berikan respon HTTP 200 OK ke DOKU
-        // Jika tidak dijawab 200 OK, DOKU akan mengira aplikasimu mati dan terus mengirim ulang notifikasi.
         return $this->response->setStatusCode(200)->setBody('OK');
     }
 }

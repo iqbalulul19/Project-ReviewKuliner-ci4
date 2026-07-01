@@ -69,6 +69,12 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('tags/store', 'TagController::store');
     $routes->post('tags/update/(:num)', 'TagController::update/$1');
     $routes->get('tags/delete/(:num)', 'TagController::delete/$1');
+
+    $routes->get('vouchers', 'VoucherController::index');
+    $routes->post('vouchers/store', 'VoucherController::store');
+    $routes->get('vouchers/delete/(:num)', 'VoucherController::delete/$1');
+    /*$routes->get('vouchers/edit/(:num)', 'VoucherController::edit/$1');*/
+    $routes->post('vouchers/update/(:num)', 'VoucherController::update/$1');
 });
 
 // ====================================================================
@@ -101,4 +107,7 @@ $routes->get('checkout/confirm/(:num)', 'DokuCheckout::confirm/$1');
 $routes->post('doku-checkout/process/(:num)', 'DokuCheckout::process/$1');
 $routes->post('doku/callback', 'DokuNotification::callback');
 $routes->post('doku/notification', 'DokuNotification::index');
-$routes->get('checkout/success', 'DokuCheckout::success');
+// $routes->get('checkout/success', 'DokuCheckout::success');
+$routes->get('checkout/cancel', 'DokuCheckout::cancel');
+$routes->get('checkout/process/(:num)', 'DokuCheckout::process/$1');
+$routes->get('checkout/success/(:segment)', 'DokuCheckout::success/$1');

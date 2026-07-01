@@ -328,6 +328,9 @@
                         <li class="<?= url_is('admin/tags*') ? 'active' : '' ?>">
                             <a href="/admin/tags"><i class="bi bi-tags-fill"></i> Kelola Tag</a>
                         </li>
+                        <li class="<?= url_is('admin/vouchers*') ? 'active' : '' ?>">
+                            <a href="/admin/vouchers"><i class="bi bi-ticket-perforated"></i> Kelola Voucher</a>
+                        </li>
                     <?php endif; ?>
                 <?php endif; ?>
             </ul>

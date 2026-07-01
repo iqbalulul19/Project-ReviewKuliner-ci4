@@ -97,53 +97,65 @@ class Place extends BaseController
         return $this->response->setContentType('application/json')->setBody($result);
     }
 
-    // Menampilkan halaman detail tempat kuliner beserta fotonya
     public function detail($id)
-{
-    $placeModel = new \App\Models\PlaceModel();
-    $photoModel = new \App\Models\PlacePhotoModel();
-    $reviewModel = new \App\Models\ReviewModel();
-    $voucherModel = new \App\Models\VoucherModel();
-    $tagModel = new \App\Models\TagModel(); // Pastikan model tag dipanggil
-
-    // 1. Ambil data tempat
-    $place = $placeModel->find($id);
-
-    if (!$place) {
-        throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Tempat kuliner tidak ditemukan!");
-    }
-
-    // 2. Ambil data pendukung
-    $photos = $photoModel->where('place_id', $id)->findAll();
-    $reviews = $reviewModel->select('reviews.*, users.name')
-            ->join('users', 'users.id = reviews.user_id')
-            ->where('place_id', $id)
-            ->orderBy('reviews.created_at', 'DESC')
-            ->findAll();
+    {
+        $placeModel = new \App\Models\PlaceModel();
+        $photoModel = new \App\Models\PlacePhotoModel();
+        $reviewModel = new \App\Models\ReviewModel();
+        $voucherModel = new \App\Models\VoucherModel();
+        $tagModel = new \App\Models\TagModel(); 
+        
+        // 1. TAMBAHKAN PEMANGGILAN MODEL TRANSAKSI
+        $uvModel = new \App\Models\UserVoucherModel(); 
     
-    // Ambil rata-rata rating
-    $avgData = $reviewModel->selectAvg('rating')->where('place_id', $id)->first();
-    $avgRating = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
-
-    // Ambil voucher
-    $vouchers = $voucherModel->getActiveVouchers($id);
-
-    // Ambil tag (asumsi kamu punya cara ambil tag berdasarkan tempat)
-    // Jika belum ada, sesuaikan dengan logic yang sudah kamu buat sebelumnya
-    $tags = []; 
-
-    // 3. Gabungkan ke dalam satu array $data
-    $data = [
-        'place'      => $place,
-        'photos'     => $photos,
-        'reviews'    => $reviews,
-        'tags'       => $tags,
-        'avg_rating' => $avgRating,
-        'vouchers'   => $vouchers
-    ];
-
-    return view('detail_place', $data);
-}
+        // 1. Ambil data tempat
+        $place = $placeModel->find($id);
+    
+        if (!$place) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Tempat kuliner tidak ditemukan!");
+        }
+    
+        // 2. Ambil data pendukung
+        $photos = $photoModel->where('place_id', $id)->findAll();
+        $reviews = $reviewModel->select('reviews.*, users.name')
+                ->join('users', 'users.id = reviews.user_id')
+                ->where('place_id', $id)
+                ->orderBy('reviews.created_at', 'DESC')
+                ->findAll();
+        
+        // Ambil rata-rata rating
+        $avgData = $reviewModel->selectAvg('rating')->where('place_id', $id)->first();
+        $avgRating = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
+    
+        // Ambil voucher
+        $vouchers = $voucherModel->getActiveVouchers($id);
+    
+        // 2. TAMBAHKAN LOGIKA PERHITUNGAN SISA VOUCHER DI SINI
+        foreach ($vouchers as &$v) {
+            // Hitung berapa voucher ini yang statusnya sudah 'paid'
+            $terjual = $uvModel->where('voucher_id', $v['id'])
+                               ->where('status', 'paid')
+                               ->countAllResults();
+                               
+            // Buat key 'sisa' baru ke dalam array voucher
+            $v['sisa'] = $v['stock'] - $terjual; 
+        }
+    
+        // Ambil tag
+        $tags = []; 
+    
+        // 3. Gabungkan ke dalam satu array $data
+        $data = [
+            'place'      => $place,
+            'photos'     => $photos,
+            'reviews'    => $reviews,
+            'tags'       => $tags,
+            'avg_rating' => $avgRating,
+            'vouchers'   => $vouchers
+        ];
+    
+        return view('detail_place', $data);
+    }
 
     public function store()
     {

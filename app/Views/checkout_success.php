@@ -91,7 +91,6 @@
 <div class="container">
     <div class="success-container">
         
-        <!-- Ikon Centang Teal -->
         <div class="icon-circle">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="4" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -101,30 +100,28 @@
         <h1 class="title-text">Payment Success</h1>
         <p class="subtitle-text">Here is your transaction details.</p>
 
-        <!-- Kotak Detail Transaksi -->
-        <div class="details-box">
-            <div class="detail-row">
-                <div class="detail-label">Customer Name:</div>
-                <div class="detail-value"><?= esc($customerName); ?></div>
-            </div>
-            
-            <div class="detail-row">
-                <!-- Kita gunakan Invoice Number/Order ID karena DOKU tidak mengembalikan nomor VA di halaman success -->
-                <div class="detail-label">Invoice Number:</div>
-                <div class="detail-value"><?= esc($orderId); ?></div>
-            </div>
-            
-            <div class="detail-row">
-                <div class="detail-label">Transaction Amount:</div>
-                <!-- Format ke Rupiah -->
-                <div class="detail-value">IDR <?= number_format($amount, 2, '.', ''); ?></div>
-            </div>
+        <div class="mb-3 d-flex justify-content-between">
+            <span class="text-muted fw-semibold">Customer Name:</span>
+            <span class="fw-bold text-dark"><?= esc($customer_name); ?></span>
         </div>
 
+        <div class="mb-3 d-flex justify-content-between">
+            <span class="text-muted fw-semibold">Invoice Number:</span>
+            <span class="fw-bold text-dark"><?= esc($order_id); ?></span>
+        </div>
+
+        <div class="mb-4 d-flex justify-content-between">
+            <span class="text-muted fw-semibold">Transaction Amount:</span>
+            <span class="fw-bold text-success">IDR <?= number_format($amount, 0, ',', '.'); ?></span>
+        </div>
+        <div class="mb-4 d-flex justify-content-between">
+            <span class="text-muted fw-semibold">Transaction Status:</span>
+            <span class="fw-bold text-primary"><?= esc(ucfirst($status)); ?></span>
+        </div>
         <a href="<?= base_url('/') ?>" class="btn-back">Back to Home</a>
 
+        </div>
     </div>
-</div>
 
 </body>
 </html>
