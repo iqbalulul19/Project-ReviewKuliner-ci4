@@ -69,6 +69,12 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
     $routes->post('tags/store', 'TagController::store');
     $routes->post('tags/update/(:num)', 'TagController::update/$1');
     $routes->get('tags/delete/(:num)', 'TagController::delete/$1');
+
+    $routes->get('vouchers', 'VoucherController::index');
+    $routes->post('vouchers/store', 'VoucherController::store');
+    $routes->get('vouchers/delete/(:num)', 'VoucherController::delete/$1');
+    /*$routes->get('vouchers/edit/(:num)', 'VoucherController::edit/$1');*/
+    $routes->post('vouchers/update/(:num)', 'VoucherController::update/$1');
 });
 
 // ====================================================================
@@ -76,10 +82,11 @@ $routes->group('admin', ['filter' => 'auth'], function ($routes) {
 // ====================================================================
 
 $routes->get('api/docs', 'Api\PlaceApi::docs');
-// PERBAIKAN: Menambahkan filter 'apikey' agar rute ini dikunci
 $routes->group('api', ['filter' => 'apikey'], function ($routes) {
     // Endpoint GET untuk mengambil semua data tempat
     $routes->get('places', 'Api\PlaceApi::index');
+    $routes->post('places', 'Api\PlaceApi::create');
+    $routes->delete('places/(:num)', 'Api\PlaceApi::delete/$1');
 
 });
 
@@ -87,5 +94,18 @@ $routes->get('/admin/validasi', 'Place::validations');
 $routes->get('/admin/validasi/approve/(:num)', 'Place::approvePlace/$1');
 $routes->get('/admin/validasi/reject/(:num)', 'Place::rejectPlace/$1');
 
+// Routes untuk fitur Favorit
+$routes->get('favorit', 'FavoriteController::index');
+$routes->post('favorit/add/(:num)', 'FavoriteController::add/$1');       // Rute khusus tambah
+$routes->post('favorit/delete/(:num)', 'FavoriteController::delete/$1'); 
 
+$routes->post('checkout/voucher/(:num)', 'CheckoutVoucher::process/$1');
 
+$routes->get('checkout/confirm/(:num)', 'DokuCheckout::confirm/$1');
+$routes->post('doku-checkout/process/(:num)', 'DokuCheckout::process/$1');
+$routes->post('doku/callback', 'DokuNotification::callback');
+$routes->post('doku/notification', 'DokuNotification::index');
+// $routes->get('checkout/success', 'DokuCheckout::success');
+$routes->get('checkout/cancel', 'DokuCheckout::cancel');
+$routes->get('checkout/process/(:num)', 'DokuCheckout::process/$1');
+$routes->get('checkout/success/(:segment)', 'DokuCheckout::success/$1');

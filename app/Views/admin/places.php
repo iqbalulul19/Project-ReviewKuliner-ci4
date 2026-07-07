@@ -16,7 +16,6 @@
             <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
                     <h5 class="mb-0 fw-bold">Daftar Tempat Kuliner</h5>
-                    <!-- Tombol ini mengarah ke halaman form tambah tempat yang sudah ada -->
                     <a href="/tambah-kuliner" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold">
                         + Tambah Tempat
                     </a>
@@ -27,9 +26,9 @@
                             <thead class="table-light">
                                 <tr>
                                     <th width="5%">No</th>
-                                    <th width="40%">Nama Tempat</th>
-                                    <th width="25%">Alamat</th>
-                                    <th width="30%" class="text-center">Aksi</th>
+                                    <th width="45%">Nama Tempat</th>
+                                    <th width="30%">Alamat</th>
+                                    <th width="20%" class="text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,7 +42,6 @@
                                             <?= esc($place['address']); ?>
                                         </td>
                                         <td class="text-center">
-                                            <!-- Asumsi detail menggunakan ID atau Slug -->
                                             <a href="/tempat/edit/<?= $place['id']; ?>" class="btn btn-sm btn-warning rounded-pill px-3 text-white shadow-sm">Edit</a>
                                             <a href="/tempat/delete/<?= $place['id']; ?>" class="btn btn-sm btn-danger rounded-pill px-3 shadow-sm" onclick="return confirm('Yakin ingin menghapus tempat kuliner ini secara permanen?');">Hapus</a>
                                         </td>

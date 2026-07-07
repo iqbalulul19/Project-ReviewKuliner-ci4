@@ -15,12 +15,11 @@ class CreateAdmins extends Migration
                 'unsigned'       => true,
                 'auto_increment' => true,
             ],
-            // ==================== TAMBAHKAN KOLOM NAME INI ====================
             'name' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 100,
             ],
-            // ==================================================================
+
             'username' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 100,
@@ -29,13 +28,12 @@ class CreateAdmins extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
             ],
-            // ==================== TAMBAHKAN KOLOM ROLE INI ====================
             'role' => [
                 'type'       => 'ENUM',
                 'constraint' => ['admin', 'user'],
                 'default'    => 'user',
             ],
-            // ==================================================================
+
             'created_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
@@ -43,7 +41,6 @@ class CreateAdmins extends Migration
         ]);
         $this->forge->addKey('id', true);
 
-        // Sesuaikan nama tabel Anda di bawah ini (apakah 'users' atau 'admins')
         $this->forge->createTable('users');
     }
 

@@ -32,7 +32,7 @@ class CreateTagsAndPlaceTags extends Migration
         $this->forge->addKey('id', true);
         $this->forge->createTable('tags');
 
-        // 2. Tabel Pivot Place Tags (Relasi Many-to-Many)
+        // 2. Tabel Pivot Place Tags 
         $this->forge->addField([
             'place_id' => [
                 'type'       => 'INT',

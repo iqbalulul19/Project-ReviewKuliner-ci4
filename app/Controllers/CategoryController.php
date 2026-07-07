@@ -17,7 +17,6 @@ class CategoryController extends BaseController
     // 1. Menampilkan Halaman Kelola Kategori
     public function index()
     {
-        // Gembok Keamanan: Tendang user biasa yang mencoba masuk
         if (session()->get('role') !== 'admin') {
             return redirect()->to('/')->with('error', 'Akses ditolak! Anda bukan admin.');
         }
@@ -31,7 +30,6 @@ class CategoryController extends BaseController
     }
 
     // 2. Menyimpan Kategori Baru
-// 2. Menyimpan Kategori Baru
     public function store()
     {
         if (session()->get('role') !== 'admin') return redirect()->to('/');

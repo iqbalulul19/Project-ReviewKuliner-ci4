@@ -13,7 +13,6 @@ class Home extends BaseController
         $keyword = $this->request->getGet('keyword');
 
         if ($keyword) {
-            // Filter: Hanya tampilkan yang disetujui (approved) saja
             $places = $placeModel->select('places.*, categories.name as category_name')
                 ->join('categories', 'categories.id = places.category_id', 'left')
                 ->where('places.status', 'approved') // <-- Kunci perbaikannya di sini
@@ -28,7 +27,7 @@ class Home extends BaseController
             $places = $placeModel->where('status', 'approved')->findAll(); // <-- Kunci perbaikannya di sini
         }
 
-        // Looping pencarian foto cover (Biarkan tetap seperti bawaan)
+        // Looping pencarian foto cover
         foreach ($places as $key => $place) {
             $cover = null;
             $path = '';
@@ -47,6 +46,14 @@ class Home extends BaseController
                     $path = 'uploads/reviews/';
                 }
             }
+
+            // Mengambil nilai rata-rata dari kolom 'rating' di tabel reviews
+            $avgData = $reviewModel->selectAvg('rating')->where('place_id', $place['id'])->first();
+            
+            // Simpan rata-rata ke dalam array (format 1 angka di belakang koma, misal: 4.5)
+            // Jika belum ada rating (null), maka beri nilai 0
+            $places[$key]['avg_rating'] = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
+            // --------------------------------------
 
             $places[$key]['cover_image'] = $cover;
             $places[$key]['cover_path'] = $path;

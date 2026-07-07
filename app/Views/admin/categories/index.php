@@ -114,7 +114,6 @@
 <?php if(session()->getFlashdata('errorValidation')) : ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // PERBAIKAN: Targetnya diubah ke #modalTambahKategori
             var myModal = new bootstrap.Modal(document.getElementById('modalTambahKategori'));
             myModal.show();
         });

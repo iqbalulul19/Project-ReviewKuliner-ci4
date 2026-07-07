@@ -6,7 +6,7 @@ use App\Models\UserModel;
 
 class Profile extends BaseController
 {
-    // 1. TAMPILAN PROFIL (Hanya Nama & Username)
+    // 1. TAMPILAN PROFIL
     public function index()
     {
         $userModel = new UserModel();
@@ -17,7 +17,7 @@ class Profile extends BaseController
             'user'  => $user
         ];
 
-        return view('profile_view', $data); // Kita buat file view ini
+        return view('profile_view', $data);
     }
 
     // 2. TAMPILAN FORM EDIT
@@ -31,10 +31,10 @@ class Profile extends BaseController
             'user'  => $user
         ];
 
-        return view('profile_edit', $data); // Kita buat file view ini
+        return view('profile_edit', $data);
     }
 
-    // 3. PROSES UPDATE (Sama seperti sebelumnya)
+    // 3. PROSES UPDATE
     public function update()
     {
         $userModel = new UserModel();

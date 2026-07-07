@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\PlaceModel;
 use App\Models\PlacePhotoModel;
 use App\Models\ReviewModel;
+use App\Models\VoucherModel;
 
 class Place extends BaseController
 {
@@ -17,10 +18,9 @@ class Place extends BaseController
         $data = [
             'title'      => 'Tambah Tempat Kuliner',
             'categories' => $categoryModel->findAll(),
-            'tags'       => $tagModel->findAll() // Kirim master tag ke view
+            'tags'       => $tagModel->findAll()
         ];
 
-        // Perbaikan: Pastikan data dilempar ke view agar checkbox muncul
         return view('add_place', $data);
     }
 
@@ -37,11 +37,7 @@ class Place extends BaseController
             ]);
         }
 
-        // ================================================================
-        // FITUR CACHE (Syarat Rubrik Poin 5 untuk nilai maksimal 15%)
-        // ================================================================
         $cache = \Config\Services::cache();
-        // Membuat nama kunci cache unik berdasarkan nama alamat
         $cacheKey = 'nominatim_' . md5(strtolower(trim($address)));
 
         // Cek apakah data koordinat alamat ini sudah pernah dicari sebelumnya
@@ -49,7 +45,6 @@ class Place extends BaseController
             // Jika ada di cache, langsung kembalikan datanya (Lebih cepat tanpa perlu hit API lagi!)
             return $this->response->setContentType('application/json')->setBody($cachedData);
         }
-        // ================================================================
 
         $url = "https://nominatim.openstreetmap.org/search?q=" . urlencode($address) . "&format=json";
 
@@ -57,7 +52,7 @@ class Place extends BaseController
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'KulinerApp_Mahasiswa/1.0'); // Identitas WAJIB untuk Nominatim
+        curl_setopt($ch, CURLOPT_USERAGENT, 'KulinerApp_Mahasiswa/1.0'); 
 
         // 2. ERROR HANDLING: Batas waktu maksimal koneksi (Timeout) 10 detik
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
@@ -101,32 +96,62 @@ class Place extends BaseController
         return $this->response->setContentType('application/json')->setBody($result);
     }
 
-    // Menampilkan halaman detail tempat kuliner beserta fotonya
     public function detail($id)
     {
         $placeModel = new \App\Models\PlaceModel();
         $photoModel = new \App\Models\PlacePhotoModel();
         $reviewModel = new \App\Models\ReviewModel();
-
-        // 1. Ambil data tempat berdasarkan ID
-        $data['place'] = $placeModel->find($id);
-
-        // Jika ID tempat tidak ada di database, munculkan halaman 404
-        if (!$data['place']) {
-            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Tempat kuliner tidak ditemukan di database!");
+        $voucherModel = new \App\Models\VoucherModel();
+        $tagModel = new \App\Models\TagModel(); 
+        
+        $uvModel = new \App\Models\UserVoucherModel(); 
+    
+        // 1. Ambil data tempat
+        $place = $placeModel->find($id);
+    
+        if (!$place) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Tempat kuliner tidak ditemukan!");
         }
-
-        // 2. Ambil semua foto yang terkait dengan tempat ini
-        $data['photos'] = $photoModel->where('place_id', $id)->findAll();
-
-        // 3. Ambil data ulasan (review) beserta NAMA user-nya
-        $data['reviews'] = $reviewModel->select('reviews.*, users.name')
-            ->join('users', 'users.id = reviews.user_id')
-            ->where('place_id', $id)
-            ->orderBy('reviews.created_at', 'DESC')
-            ->findAll();
-
-        // 4. Kirim semua data ke file view 'detail_place.php'
+    
+        // 2. Ambil data pendukung
+        $photos = $photoModel->where('place_id', $id)->findAll();
+        $reviews = $reviewModel->select('reviews.*, users.name')
+                ->join('users', 'users.id = reviews.user_id')
+                ->where('place_id', $id)
+                ->orderBy('reviews.created_at', 'DESC')
+                ->findAll();
+        
+        // Ambil rata-rata rating
+        $avgData = $reviewModel->selectAvg('rating')->where('place_id', $id)->first();
+        $avgRating = $avgData['rating'] ? number_format($avgData['rating'], 1) : 0;
+    
+        // Ambil voucher
+        $vouchers = $voucherModel->getActiveVouchers($id);
+    
+        // 2. TAMBAHKAN LOGIKA PERHITUNGAN SISA VOUCHER DI SINI
+        foreach ($vouchers as &$v) {
+            // Hitung berapa voucher ini yang statusnya sudah 'paid'
+            $terjual = $uvModel->where('voucher_id', $v['id'])
+                               ->where('status', 'paid')
+                               ->countAllResults();
+                               
+            // Buat key 'sisa' baru ke dalam array voucher
+            $v['sisa'] = $v['stock'] - $terjual; 
+        }
+    
+        // Ambil tag
+        $tags = []; 
+    
+        // 3. Gabungkan ke dalam satu array $data
+        $data = [
+            'place'      => $place,
+            'photos'     => $photos,
+            'reviews'    => $reviews,
+            'tags'       => $tags,
+            'avg_rating' => $avgRating,
+            'vouchers'   => $vouchers
+        ];
+    
         return view('detail_place', $data);
     }
 
@@ -278,7 +303,6 @@ class Place extends BaseController
         $categoryModel = new \App\Models\CategoryModel();
         $tagModel = new \App\Models\TagModel();
 
-        // ==================== KUNCI AMAN FORM EDIT TAG ====================
         // Ambil data ID tag yang sudah berelasi dengan tempat kuliner ini dari tabel pivot
         $db = \Config\Database::connect();
         $currentTags = $db->table('place_tags')
@@ -287,9 +311,7 @@ class Place extends BaseController
             ->get()
             ->getResultArray();
 
-        // Konversikan hasil array multi-dimensi menjadi array satu dimensi (contoh: [1, 3, 5])
         $mappedTags = array_column($currentTags, 'tag_id');
-        // ==================================================================
 
         $data = [
             'title'      => 'Edit Tempat Kuliner',
@@ -307,7 +329,6 @@ class Place extends BaseController
     {
         $placeModel = new PlaceModel();
 
-        // Ambil data post dan pastikan category_id ikut ditangkap
         $placeModel->update($id, [
             'name'        => $this->request->getPost('name'),
             'category_id' => $this->request->getPost('category_id'),
@@ -316,11 +337,9 @@ class Place extends BaseController
             'longitude'   => $this->request->getPost('longitude'),
         ]);
 
-        // ==================== UPDATE RELASI TAG SAAT EDIT ====================
         $selectedTags = $this->request->getPost('tags') ?? [];
         $tagModel = new \App\Models\TagModel();
         $tagModel->syncPlaceTags($id, $selectedTags);
-        // =====================================================================
 
         return redirect()->to('/tempat/' . $id)->with('success', 'Data tempat berhasil diperbarui.');
     }
@@ -409,7 +428,6 @@ class Place extends BaseController
             return redirect()->back()->with('error', 'Akses ditolak! Anda hanya bisa menghapus ulasan Anda sendiri.');
         }
 
-        // Hapus foto fisik dari server
         if (!empty($review['photo']) && file_exists(FCPATH . 'uploads/reviews/' . $review['photo'])) {
             unlink(FCPATH . 'uploads/reviews/' . $review['photo']);
         }

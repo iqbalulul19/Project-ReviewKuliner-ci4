@@ -10,13 +10,10 @@ class ApiKeyFilter implements FilterInterface
 {
     public function before(RequestInterface $request, $arguments = null)
     {
-        // Menangkap API Key yang dikirim melalui Header HTTP
         $key = $request->getHeaderLine('X-API-KEY');
         
-        // Ini adalah kunci rahasia kita (Bisa diganti sesukamu nanti)
         $validKey = 'KULINER-API-2026'; 
 
-        // Jika kunci kosong atau salah, tolak aksesnya! (401 Unauthorized)
         if (empty($key) || $key !== $validKey) {
             return \Config\Services::response()
                 ->setStatusCode(401)

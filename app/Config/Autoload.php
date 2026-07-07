@@ -38,7 +38,10 @@ class Autoload extends AutoloadConfig
      * @var array<string, list<string>|string>
      */
     public $psr4 = [
-        APP_NAMESPACE => APPPATH,
+    APP_NAMESPACE => APPPATH,
+    'Config'      => APPPATH . 'Config',
+    // TAMBAHKAN BARIS DI BAWAH INI:
+    'Doku'        => ROOTPATH . 'vendor/doku/doku-php-library/src',
     ];
 
     /**

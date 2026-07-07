@@ -34,7 +34,6 @@ class TagController extends BaseController
     ];
 
     if (!$this->validate($rules)) {
-      // Menggunakan redirect()->to dan mengubah nama flashdata menjadi 'tag_errors'
       return redirect()->to('/admin/tags')->withInput()->with('tag_errors', $this->validator->getErrors())->with('modal_action', 'tambah');
     }
 

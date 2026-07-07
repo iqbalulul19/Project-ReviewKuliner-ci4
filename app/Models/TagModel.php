@@ -25,10 +25,8 @@ class TagModel extends Model
   // Helper untuk menyinkronkan tag saat insert/update tempat
   public function syncPlaceTags($placeId, array $tagIds)
   {
-    // Hapus relasi lama terlebih dahulu
     $this->db->table('place_tags')->where('place_id', $placeId)->delete();
 
-    // Masukkan relasi baru jika ada tag yang dipilih
     if (!empty($tagIds)) {
       $data = [];
       foreach ($tagIds as $tagId) {
