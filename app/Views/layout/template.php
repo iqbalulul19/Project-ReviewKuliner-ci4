@@ -417,6 +417,10 @@
                 });
             }
 
+<<<<<<< HEAD
+=======
+            // Tutup sidebar jika user klik di area gelap (overlay)
+>>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
             if (overlay) {
                 overlay.addEventListener('click', function() {
                     sidebar.classList.remove('active');

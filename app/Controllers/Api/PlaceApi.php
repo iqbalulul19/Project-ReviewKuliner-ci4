@@ -61,6 +61,10 @@ class PlaceApi extends ResourceController
     {
         $placeModel = new PlaceModel();
 
+<<<<<<< HEAD
+=======
+        // Tangkap data yang dikirimkan via API
+>>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
         $data = [
             'name'        => $this->request->getVar('name'),
             'category_id' => $this->request->getVar('category_id'),

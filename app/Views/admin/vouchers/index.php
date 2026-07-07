@@ -93,10 +93,18 @@
                             <label class="form-label fw-semibold">Stok</label>
                             <input type="number" name="stock" class="form-control" required>
                         </div>
+<<<<<<< HEAD
+=======
+                        <!-- TAMBAHAN KOLOM DESKRIPSI -->
+>>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Deskripsi</label>
                             <textarea name="description" class="form-control" rows="2" placeholder="Jelaskan detail diskon..."></textarea>
                         </div>
+<<<<<<< HEAD
+=======
+                        <!-- END TAMBAHAN -->
+>>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Tanggal Kadaluwarsa</label>
                             <input type="date" name="expired_at" class="form-control" required>
@@ -166,6 +174,10 @@
 
 <script>
 function editVoucher(voucher) {
+<<<<<<< HEAD
+=======
+    // Isi nilai input modal dengan data dari row tabel
+>>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
     document.getElementById('editForm').action = '/admin/vouchers/update/' + voucher.id;
     document.getElementById('edit_id').value = voucher.id;
     document.getElementById('edit_title').value = voucher.title;
@@ -174,6 +186,10 @@ function editVoucher(voucher) {
     document.getElementById('edit_description').value = voucher.description;
     document.getElementById('edit_expired_at').value = voucher.expired_at;
     document.getElementById('edit_place_id').value = voucher.place_id;
+<<<<<<< HEAD
+=======
+    // Tampilkan modal
+>>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
     var myModal = new bootstrap.Modal(document.getElementById('editVoucherModal'));
     myModal.show();
 }

@@ -95,6 +95,10 @@ $routes->get('/admin/validasi/approve/(:num)', 'Place::approvePlace/$1');
 $routes->get('/admin/validasi/reject/(:num)', 'Place::rejectPlace/$1');
 
 // Routes untuk fitur Favorit
+<<<<<<< HEAD
+=======
+// Fitur Favorit
+>>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
 $routes->get('favorit', 'FavoriteController::index');
 $routes->post('favorit/add/(:num)', 'FavoriteController::add/$1');       // Rute khusus tambah
 $routes->post('favorit/delete/(:num)', 'FavoriteController::delete/$1'); 

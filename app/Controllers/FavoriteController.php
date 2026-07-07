@@ -23,6 +23,7 @@ class FavoriteController extends BaseController
 
     $data = [
       'title'  => 'Favorit Saya',
+
       'places' => $this->favoriteModel->getFavoritePlaces($userId)
     ];
 
