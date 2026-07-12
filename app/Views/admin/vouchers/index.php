@@ -93,18 +93,12 @@
                             <label class="form-label fw-semibold">Stok</label>
                             <input type="number" name="stock" class="form-control" required>
                         </div>
-<<<<<<< HEAD
-=======
-                        <!-- TAMBAHAN KOLOM DESKRIPSI -->
->>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
+
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Deskripsi</label>
                             <textarea name="description" class="form-control" rows="2" placeholder="Jelaskan detail diskon..."></textarea>
                         </div>
-<<<<<<< HEAD
-=======
-                        <!-- END TAMBAHAN -->
->>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
+
                         <div class="col-md-12">
                             <label class="form-label fw-semibold">Tanggal Kadaluwarsa</label>
                             <input type="date" name="expired_at" class="form-control" required>
@@ -124,8 +118,8 @@
 <div class="modal fade" id="editVoucherModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content rounded-4 border-0 shadow">
-            <form id="editForm" action="" method="post">
-                <div class="modal-header border-0 pb-0 pt-4 px-4">
+            <form id="editForm" action="" method="POST">
+                <div class="modal-header bg-primary text-white border-0">
                     <h5 class="modal-title fw-bold">Edit Voucher</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
@@ -174,10 +168,6 @@
 
 <script>
 function editVoucher(voucher) {
-<<<<<<< HEAD
-=======
-    // Isi nilai input modal dengan data dari row tabel
->>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
     document.getElementById('editForm').action = '/admin/vouchers/update/' + voucher.id;
     document.getElementById('edit_id').value = voucher.id;
     document.getElementById('edit_title').value = voucher.title;
@@ -186,10 +176,7 @@ function editVoucher(voucher) {
     document.getElementById('edit_description').value = voucher.description;
     document.getElementById('edit_expired_at').value = voucher.expired_at;
     document.getElementById('edit_place_id').value = voucher.place_id;
-<<<<<<< HEAD
-=======
-    // Tampilkan modal
->>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
+
     var myModal = new bootstrap.Modal(document.getElementById('editVoucherModal'));
     myModal.show();
 }

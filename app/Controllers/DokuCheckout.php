@@ -31,7 +31,7 @@ class DokuCheckout extends BaseController
             'place'   => $place
         ];
 
-        return view('checkout_confirm', $data); // Sesuaikan dengan nama view milikmu
+        return view('checkout_confirm', $data);
     }
 
     // Fungsi proses menggunakan API langsung (CURL CI4)
@@ -69,15 +69,14 @@ class DokuCheckout extends BaseController
                 'amount'         => (int)$voucher['price'],
                 'invoice_number' => $invoiceNumber,
                 'currency'       => 'IDR',
-                // UBAH BARIS INI: Tambahkan garis miring (/) dan variabel $invoiceNumber
-                'callback_url'   => 'https://antiquity-arose-fit.ngrok-free.dev/checkout/success/' . $invoiceNumber 
+                'callback_url' => 'https://antiquity-arose-fit.ngrok-free.dev/checkout/success/' . $invoiceNumber 
             ],
             'payment' => [
-                'payment_due_date' => 60 
+                'payment_due_date' => 60 // batas waktu pembayaran dalam 60 menit
             ],
             'customer' => [
                 'name'  => session()->get('name') ?? 'Guest',
-                'email' => session()->get('email') ?? 'guest@example.com'
+                'email' => session()->get('email') ?? 'iqbalulul19@gmail.com'
             ],
             'notify_url' => 'https://antiquity-arose-fit.ngrok-free.dev/doku/notification'
         ];

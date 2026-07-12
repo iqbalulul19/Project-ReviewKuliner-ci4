@@ -12,7 +12,7 @@
       <div class="card-body p-4">
 
         <form action="/place/store" method="post" enctype="multipart/form-data">
-          <?= csrf_field(); ?>
+          <?= csrf_field() ?>
 
           <?php $errors = session()->getFlashdata('errors'); ?>
           <?php if (!empty($errors)) : ?>

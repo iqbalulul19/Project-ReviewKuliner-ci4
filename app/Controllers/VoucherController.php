@@ -2,7 +2,7 @@
 namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Models\VoucherModel;
-use App\Models\PlaceModel; // Tambahkan ini
+use App\Models\PlaceModel; 
 
 class VoucherController extends BaseController
 {
@@ -53,5 +53,18 @@ class VoucherController extends BaseController
             'description' => $this->request->getPost('description'),
         ]);
         return redirect()->to('/admin/vouchers')->with('success', 'Berhasil diperbarui!');
+    }
+
+    public function delete($id)
+    {
+        $voucherModel = new \App\Models\VoucherModel(); 
+        
+        $voucher = $voucherModel->find($id);
+        if ($voucher) {
+            $voucherModel->delete($id);
+            return redirect()->back()->with('success', 'Voucher berhasil dihapus.');
+        }
+        
+        return redirect()->back()->with('error', 'Voucher tidak ditemukan.');
     }
 }

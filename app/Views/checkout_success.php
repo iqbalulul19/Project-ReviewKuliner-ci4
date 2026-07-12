@@ -21,7 +21,7 @@
         .icon-circle {
             width: 120px;
             height: 120px;
-            background-color: #00a693; /* Warna Teal khas gambar */
+            background-color: #00a693; 
             border-radius: 50%;
             display: flex;
             align-items: center;

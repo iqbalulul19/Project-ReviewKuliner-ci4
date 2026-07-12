@@ -76,7 +76,31 @@ class Filters extends BaseFilters
         'before' => [
             'csrf' => [
                 'except' => [
-                    'doku/notification'
+                    'doku/notification',
+                    'place/store',            
+                    'place/searchNominatim',
+                    'tempat/update/*',          
+                    'admin/vouchers/store',    
+                    'admin/vouchers/update/*',
+                    'admin/vouchers/delete/*',
+                    'admin/places/store',
+                    'admin/places/update/*',
+                    'admin/places/delete/*',
+                    'admin/users/store',
+                    'admin/users/update/*',
+                    'admin/users/delete/*',
+                    'admin/users/roles/*',
+                    'admin/users/permissions/*',
+                    'admin/users/assign-roles/*',
+                    'admin/users/assign-permissions/*',
+                    'admin/users/remove-roles/*',
+                    'admin/users/remove-permissions/*',
+                    'admin/users/assign-roles-permissions/*',
+                    'admin/users/remove-roles-permissions/*',
+                    'review/store',       
+                    'ulasan/simpan/*',    
+                    'places/addReview/*'
+
                 ]
             ]
         ],

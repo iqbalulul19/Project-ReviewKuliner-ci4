@@ -8,11 +8,9 @@ class DokuNotification extends BaseController
     public function index()
     {
         $rawPayload = file_get_contents('php://input');
-        
         log_message('error', 'DOKU_DEBUG: Notifikasi diterima. Payload: ' . $rawPayload);
 
         $payload = json_decode($rawPayload, true);
-
         // Jika JSON tidak valid, hentikan
         if (!$payload) {
             log_message('error', 'DOKU_DEBUG: Payload kosong atau tidak valid.');

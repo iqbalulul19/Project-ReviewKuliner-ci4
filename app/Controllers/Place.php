@@ -318,7 +318,7 @@ class Place extends BaseController
             'place'      => $placeModel->find($id),
             'categories' => $categoryModel->findAll(),
             'tags'       => $tagModel->findAll(),
-            'currentTags' => $mappedTags // Kirimkan data tag aktif ini ke file view edit_place.php
+            'currentTags' => $mappedTags 
         ];
 
         return view('edit_place', $data);

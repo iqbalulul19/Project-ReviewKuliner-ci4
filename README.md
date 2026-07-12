@@ -44,11 +44,10 @@ composer install
 ```
 
 ### 3. Konfigurasi Environment
-
-Copy file `env` yang ada di root folder menjadi `.env`:
+Rubah file `.env.example`  menjadi `.env`:
 
 ```bash
-cp env .env
+cp .env.example .env
 ```
 
 Buka file `.env` di teks editor, hapus tanda `#` pada `CI_ENVIRONMENT` lalu ubah menjadi:

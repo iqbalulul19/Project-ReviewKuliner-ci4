@@ -95,21 +95,17 @@ $routes->get('/admin/validasi/approve/(:num)', 'Place::approvePlace/$1');
 $routes->get('/admin/validasi/reject/(:num)', 'Place::rejectPlace/$1');
 
 // Routes untuk fitur Favorit
-<<<<<<< HEAD
-=======
-// Fitur Favorit
->>>>>>> 182126222d0ec10dd9f8946fc95789d2be08206a
 $routes->get('favorit', 'FavoriteController::index');
 $routes->post('favorit/add/(:num)', 'FavoriteController::add/$1');       // Rute khusus tambah
 $routes->post('favorit/delete/(:num)', 'FavoriteController::delete/$1'); 
 
+// Routes DOKU Payment
 $routes->post('checkout/voucher/(:num)', 'CheckoutVoucher::process/$1');
-
 $routes->get('checkout/confirm/(:num)', 'DokuCheckout::confirm/$1');
 $routes->post('doku-checkout/process/(:num)', 'DokuCheckout::process/$1');
 $routes->post('doku/callback', 'DokuNotification::callback');
 $routes->post('doku/notification', 'DokuNotification::index');
-// $routes->get('checkout/success', 'DokuCheckout::success');
 $routes->get('checkout/cancel', 'DokuCheckout::cancel');
 $routes->get('checkout/process/(:num)', 'DokuCheckout::process/$1');
 $routes->get('checkout/success/(:segment)', 'DokuCheckout::success/$1');
+
